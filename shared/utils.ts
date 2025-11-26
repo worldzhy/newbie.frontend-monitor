@@ -26,10 +26,12 @@ export const func = {
     return pwd + Date.now();
   },
   result<T>(jn: Partial<{ code: number; desc: string; data: T; time?: number }> = {}) {
-    return Object.assign({ code: 1000, desc: '成功', data: '' }, jn);
+    // return Object.assign({ code: 1000, desc: '成功', data: '' }, jn);
+    return jn.data;
   },
   errResult<T>(jn: Partial<{ code: number; desc: string; data: T; time?: number }> = {}) {
-    return Object.assign({ code: 1010, desc: '请求失败', data: '' }, jn);
+    // return Object.assign({ code: 1010, desc: '请求失败', data: '' }, jn);
+    return jn.data;
   },
   format(date: Date, fmt: string) {
     const o: Record<string, number> = {

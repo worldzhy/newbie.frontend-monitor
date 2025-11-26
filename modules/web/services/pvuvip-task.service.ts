@@ -20,7 +20,7 @@ export class WebPvuvipTaskService {
     private readonly system: SystemService,
     private readonly pvuvip: PvuvipService
   ) {
-    this.cfg = this.config.get("app");
+    this.cfg = this.config.get('microservices.frontend-monitor');
   }
 
   async getWebPvUvIpByMinute() {

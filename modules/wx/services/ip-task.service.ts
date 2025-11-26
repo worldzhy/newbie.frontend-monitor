@@ -16,7 +16,7 @@ export class WxIpTaskService {
     private readonly redis: RedisService,
     private readonly system: SystemService
   ) {
-    this.cfg = this.config.get("app");
+    this.cfg = this.config.get('microservices.frontend-monitor');
   }
 
   async saveWxGetIpDatas() {

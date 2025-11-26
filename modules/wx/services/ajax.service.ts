@@ -7,7 +7,7 @@ import { ConfigService } from '@nestjs/config';
 export class WxAjaxService {
   private cfg: any;
   constructor(private readonly ch: ClickhouseService, private readonly config: ConfigService) {
-    this.cfg = this.config.get('frontend-monitor');
+    this.cfg = this.config.get('microservices.frontend-monitor');
   }
 
   async getPageAjaxsAvg(appId: string, url: string, beginTime?: string, endTime?: string) {

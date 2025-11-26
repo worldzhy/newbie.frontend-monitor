@@ -8,7 +8,7 @@ export class TokenMiddleware implements NestMiddleware {
 
   use(req: Request, res: Response, next: NextFunction) {
     const origin = req.headers.origin as string | undefined;
-    const adminWhiteList = this.configService.get('frontend-monitor.adminWhiteList');
+    const adminWhiteList = this.configService.get('microservices.frontend-monitor.adminWhiteList');
 
     if (origin && adminWhiteList?.includes(origin)) {
       res.setHeader('Access-Control-Allow-Origin', origin);

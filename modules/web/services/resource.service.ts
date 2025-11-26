@@ -7,7 +7,7 @@ import { ConfigService } from '@nestjs/config';
 export class ResourceService {
   private cfg: any;
   constructor(private readonly mongo: MongoModelsService, private readonly config: ConfigService) {
-    this.cfg = this.config.get('frontend-monitor');
+    this.cfg = this.config.get('microservices.frontend-monitor');
   }
 
   async getResourceForType(appId: string, url: string, speedType: number, pageNo: number, pageSize: number, beginTime?: string, endTime?: string) {

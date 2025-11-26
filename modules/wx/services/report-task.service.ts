@@ -17,7 +17,7 @@ export class WxReportTaskService {
     private readonly ch: ClickhouseService,
     private readonly system: SystemService
   ) {
-    this.cfg = this.config.get('frontend-monitor');
+    this.cfg = this.config.get('microservices.frontend-monitor');
   }
 
   async saveWxReportDatasForRedis() {

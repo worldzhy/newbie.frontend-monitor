@@ -60,7 +60,7 @@ export class PvuvipService {
       new Date().valueOf() < endTime.valueOf()
     ) {
       const today = new Date(func.format(new Date(), "yyyy/MM/dd")).getTime();
-      num = await this.dayReportNum.getTodayFromRedis(appId, today);
+      num = await this.dayReportNum.getTodayFromRedis(appId, today) as string;
     } else {
       const numResult = await this.dayReportNum.getDayFromMongo(
         appId,

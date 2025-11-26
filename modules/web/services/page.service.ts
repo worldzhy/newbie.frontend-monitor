@@ -11,7 +11,7 @@ export class PageService {
     private readonly mongo: MongoModelsService,
     private readonly config: ConfigService
   ) {
-    this.cfg = this.config.get("app");
+    this.cfg = this.config.get('microservices.frontend-monitor');
   }
 
   async getAveragePageList(query: any) {
@@ -123,7 +123,7 @@ export class PageService {
     const { appId, type = "", beginTime, endTime } = query;
     const match: any = { is_first_in: 2 };
     if (type) match.speed_type = Number(type);
-    const _querys = this.getSpaceTime(beginTime, endTime, 60000);
+    const _querys: any = this.getSpaceTime(beginTime, endTime, 60000);
     const result = await this.mongo
       .WebPage(appId)
       .aggregate([
@@ -241,7 +241,7 @@ export class PageService {
   ) {
     const begin = new Date(beginTime || new Date()).getTime();
     const end = new Date(endTime || new Date()).getTime();
-    const list = [];
+    const list: any = [];
     for (let t = begin; t <= end; t += spaceTime) {
       list.push({ beginTime: t, endTime: t + spaceTime, result: null });
     }

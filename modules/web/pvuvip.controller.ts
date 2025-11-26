@@ -14,7 +14,7 @@ export class PvuvipController {
     private readonly pvuvipSrv: PvuvipService,
     private readonly dayReportNum: DayReportNumService
   ) {
-    this.cfg = this.configService.get("frontend-monitor");
+    this.cfg = this.configService.get('microservices.frontend-monitor');
   }
 
   @Get("/getPvUvIpSurveyToday")

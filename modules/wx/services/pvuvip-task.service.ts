@@ -22,7 +22,7 @@ export class WxPvuvipTaskService {
     private readonly mongo: MongoModelsService,
     private readonly ch: ClickhouseService
   ) {
-    this.cfg = this.config.get("app");
+    this.cfg = this.config.get('microservices.frontend-monitor');
   }
 
   async getWxPvUvIpByMinute() {

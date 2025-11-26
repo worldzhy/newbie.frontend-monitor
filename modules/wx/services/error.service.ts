@@ -7,7 +7,7 @@ import { ConfigService } from '@nestjs/config';
 export class WxErrorService {
   private cfg: any;
   constructor(private readonly ch: ClickhouseService, private readonly config: ConfigService) {
-    this.cfg = this.config.get('frontend-monitor');
+    this.cfg = this.config.get('microservices.frontend-monitor');
   }
 
   async getAverageErrorList(query: any) {

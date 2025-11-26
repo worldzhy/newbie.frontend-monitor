@@ -28,7 +28,7 @@ import { WxModule } from './modules/wx/wx.module';
   ],
   providers: []
 })
-export class AppModule {
+export class FrontendMonitorModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(TokenMiddleware)
