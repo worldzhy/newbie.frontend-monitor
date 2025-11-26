@@ -1,0 +1,52 @@
+import { DATA_TYPE } from 'clickhouse-orm';
+
+export default function WebError(chOrm: any) {
+  const schema = {
+    tableName: 'web_errors_',
+    schema: {
+      create_time: { type: DATA_TYPE.DateTime, default: Date.now }, // Created time
+      msg: { type: DATA_TYPE.String }, // Error message
+      name: { type: DATA_TYPE.String }, // JS error type
+      stack: { type: DATA_TYPE.String }, // Stack trace
+      target: { type: DATA_TYPE.LowCardinality(DATA_TYPE.String) }, // Resource type
+      type: { type: DATA_TYPE.LowCardinality(DATA_TYPE.String) }, // Error type
+      api: { type: DATA_TYPE.LowCardinality(DATA_TYPE.String) }, // Source API (onerror, unhandlerejection, Vue/React handlers)
+      status: { type: DATA_TYPE.String }, // HTTP status
+      col: { type: DATA_TYPE.String }, // Column
+      line: { type: DATA_TYPE.String }, // Line
+      query: { type: DATA_TYPE.String }, // HTTP query params
+      options: { type: DATA_TYPE.String }, // POST body params
+      method: { type: DATA_TYPE.LowCardinality(DATA_TYPE.String) }, // Request method
+      full_url: { type: DATA_TYPE.String }, // Full error resource URL
+      resource_url: { type: DATA_TYPE.String }, // Error resource URL
+      url: { type: DATA_TYPE.String }, // Page URL
+      mark_page: { type: DATA_TYPE.String }, // Page mark
+      mark_user: { type: DATA_TYPE.String }, // User mark
+      phone: { type: DATA_TYPE.String }, // User phone
+      uid: { type: DATA_TYPE.String }, // User ID
+      trace_id: { type: DATA_TYPE.String }, // Trace ID
+    },
+    options: `ENGINE = MergeTree
+    PARTITION BY toYYYYMM(create_time)
+    ORDER BY create_time`,
+    autoCreate: true,
+    autoSync: true,
+  };
+
+  const models: Record<string, any> = {};
+  const modelCreates: Record<string, Promise<any>> = {};
+  return async (appId: string) => {
+    if (!models[appId]) {
+      if (!modelCreates[appId]) {
+        modelCreates[appId] = chOrm.model({
+          ...schema,
+          tableName: schema.tableName + appId,
+        });
+      }
+      const model = await modelCreates[appId];
+      delete modelCreates[appId];
+      models[appId] = model;
+    }
+    return models[appId];
+  };
+}

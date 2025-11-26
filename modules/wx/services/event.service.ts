@@ -1,0 +1,22 @@
+// ts:src/modules/wx/services/event.service.ts
+import { Injectable } from '@nestjs/common';
+import { ClickhouseService } from '../../../models/clickhouse/clickhouse.service';
+
+@Injectable()
+export class WxEventService {
+  constructor(private readonly ch: ClickhouseService) {}
+
+  async getEventList({ appId, beginTime, endTime, pageNo, pageSize, event }: { appId: string; beginTime?: string; endTime?: string; pageNo: number; pageSize: number; event?: string }) {
+    const wheres: string[] = [];
+    let where: string | undefined;
+    if (beginTime) wheres.push(`create_time>=toDateTime('${beginTime}')`);
+    if (endTime) wheres.push(`create_time<=toDateTime('${endTime}')`);
+    if (event) wheres.push(`ilike(event,'%${event}%')`);
+    if (wheres.length > 0) where = wheres.join(' and ');
+    const model = await this.ch.WxEvent(appId);
+    const countQuery = model.find({ select: 'count(*) AS total', where });
+    const listQuery = model.find({ where, limit: pageSize, skip: (pageNo - 1) * pageSize, orderBy: 'create_time DESC' });
+    const [count, list] = await Promise.all([countQuery, listQuery]);
+    return { list, pageNo, totalNum: count?.[0]?.total || 0 };
+  }
+}
