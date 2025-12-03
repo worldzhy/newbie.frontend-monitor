@@ -7,6 +7,7 @@ import { SystemService } from "../../modules/system/system.service";
 import { NodeCacheService } from "../../shared/node-cache.service";
 import { func } from "../../shared/utils";
 import { DayReportNumService } from "../../modules/day-report/day-report-num.service";
+import { RedisKeys } from "../../models/enum";
 import { WebReportTaskService } from "../../modules/web/services/report-task.service";
 import { WebPvuvipTaskService } from "../../modules/web/services/pvuvip-task.service";
 import { WebIpTaskService } from "../../modules/web/services/ip-task.service";
@@ -102,7 +103,7 @@ export class JobsService implements OnModuleInit {
   @Cron("0 */2 * * * *", { timeZone: "Asia/Shanghai" })
   async pvuvipMinuteCount() {
     const getLock = await this.redisLock(
-      "pvuvip_pre_minute_lock",
+      RedisKeys.PVUVIP_PRE_MINUTE_LOCK,
       this.cfg.pvuvip_task_minute_lock_time
     );
     if (!getLock) return;
@@ -113,7 +114,7 @@ export class JobsService implements OnModuleInit {
   @Cron("0 */1 * * * *", { timeZone: "Asia/Shanghai" })
   async ipTask() {
     const getLock = await this.redisLock(
-      "ip_task_lock",
+      RedisKeys.IP_TASK_LOCK,
       this.cfg.ip_task_lock_time
     );
     if (!getLock) return;
@@ -124,7 +125,7 @@ export class JobsService implements OnModuleInit {
   @Cron("0 0 0 */1 * *", { timeZone: "Asia/Shanghai" })
   async dayReportNumTask() {
     const getLock = await this.redisLock(
-      "day_report_num_task_lock",
+      RedisKeys.DAY_REPORT_NUM_TASK_LOCK,
       this.cfg.day_report_num_task_lock_time
     );
     if (!getLock) return;
@@ -135,7 +136,7 @@ export class JobsService implements OnModuleInit {
   async preDayReportTask() {
     if (!this.cfg.day_report) return;
     const getLock = await this.redisLock(
-      "day_report_task_lock",
+      RedisKeys.DAY_REPORT_TASK_LOCK,
       this.cfg.day_report_task_lock_time
     );
     if (!getLock) return;

@@ -1,4 +1,3 @@
-// ts:src/modules/wx/custom.controller.ts
 import { Controller, Get, Post, Body, Query } from "@nestjs/common";
 import { func } from "../../shared/utils";
 import { WxCustomService } from "./services/custom.service";

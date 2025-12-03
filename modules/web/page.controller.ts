@@ -1,4 +1,3 @@
-// src/modules/web/page.controller.ts
 import { Controller, Get, Query } from '@nestjs/common';
 import { func } from '../../shared/utils';
 import { PageService } from './services/page.service';

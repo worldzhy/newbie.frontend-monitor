@@ -1,4 +1,3 @@
-// src/modules/wx/services/analysis.service.ts
 import { Injectable } from "@nestjs/common";
 import { MongoModelsService } from "../../../models/mongo/mongo.service";
 import { ConfigService } from "@nestjs/config";

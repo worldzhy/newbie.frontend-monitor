@@ -1,4 +1,3 @@
-// src/modules/wx/services/ip-task.service.ts
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { MongoModelsService } from "../../../models/mongo/mongo.service";
@@ -6,6 +5,7 @@ import { RedisService } from "../../../models/redis/redis.service";
 import { SystemService } from "../../../modules/system/system.service";
 import { func } from "../../../shared/utils";
 import * as https from "https";
+import { RedisKeyPrefix } from "../../../models/enum";
 
 @Injectable()
 export class WxIpTaskService {
@@ -32,7 +32,7 @@ export class WxIpTaskService {
   private async saveWxGetIpDatasByOne(appId: string) {
     try {
       const query: any = { city: { $exists: false } };
-      const beginTime = await this.redis.get(`wx_ip_task_begin_time_${appId}`);
+      const beginTime = await this.redis.get(`${RedisKeyPrefix.WX_IP_TASK_BEGIN_TIME}${appId}`);
       query.create_time = {
         $gt: beginTime
           ? new Date(beginTime)
@@ -52,7 +52,7 @@ export class WxIpTaskService {
         }
       } else {
         await this.redis.set(
-          `wx_ip_task_begin_time_${appId}`,
+          `${RedisKeyPrefix.WX_IP_TASK_BEGIN_TIME}${appId}`,
           new Date().toString()
         );
       }
@@ -69,7 +69,7 @@ export class WxIpTaskService {
     }
     if (lastLen === 0) {
       await this.redis.set(
-        `wx_ip_task_begin_time_${appId}`,
+        `${RedisKeyPrefix.WX_IP_TASK_BEGIN_TIME}${appId}`,
         data[data.length - 1].create_time
       );
     }

@@ -1,8 +1,9 @@
 import { DATA_TYPE } from 'clickhouse-orm';
+import { ClickHouseTablePrefix } from '../../enum';
 
 export default function WebAjax(chOrm: any) {
   const schema = {
-    tableName: 'web_ajaxs_',
+    tableName: ClickHouseTablePrefix.WEB_AJAX,
     schema: {
       create_time: { type: DATA_TYPE.DateTime, default: Date.now }, // Created time
       url: { type: DATA_TYPE.String }, // AJAX URL

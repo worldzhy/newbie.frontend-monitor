@@ -1,4 +1,3 @@
-// src/modules/web/web.module.ts
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ClickhouseModule } from '../../models/clickhouse/clickhouse.module';

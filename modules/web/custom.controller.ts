@@ -1,4 +1,3 @@
-// src/modules/web/custom.controller.ts
 import { Controller, Get, Post, Body, Query } from "@nestjs/common";
 import { func } from "../../shared/utils";
 import { WebCustomService } from "./services/custom.service";

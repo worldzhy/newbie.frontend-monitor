@@ -1,4 +1,3 @@
-// src/modules/wx/error.controller.ts
 import { Controller, Get, Query } from '@nestjs/common';
 import { func } from '../../shared/utils';
 import { WxErrorService } from './services/error.service';

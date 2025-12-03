@@ -1,4 +1,3 @@
-// ts:src/modules/wx/event.controller.ts
 import { Controller, Get, Query } from '@nestjs/common';
 import { func } from '../../shared/utils';
 import { WxEventService } from './services/event.service';

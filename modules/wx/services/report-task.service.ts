@@ -1,4 +1,3 @@
-// src/modules/wx/services/report-task.service.ts
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { RedisService } from '../../../models/redis/redis.service';
@@ -6,6 +5,7 @@ import { MongoModelsService } from '../../../models/mongo/mongo.service';
 import { ClickhouseService } from '../../../models/clickhouse/clickhouse.service';
 import { SystemService } from '../../../modules/system/system.service';
 import { func } from '../../../shared/utils';
+import { RedisKeys } from '../../../models/enum';
 
 @Injectable()
 export class WxReportTaskService {
@@ -46,7 +46,7 @@ export class WxReportTaskService {
   }
 
   private async getWxItemDataForRedis({ appEvents, appAjaxs, appErrors }: { appEvents: Record<string, any[]>; appAjaxs: Record<string, any[]>; appErrors: Record<string, any[]> }) {
-    let query: any = await this.redis.rpop('wx_repore_datas');
+    let query: any = await this.redis.rpop(RedisKeys.WX_REPORT_DATAS);
     if (!query) return;
     try { query = JSON.parse(query); } catch { return; }
     const querytype = query.type || 1;

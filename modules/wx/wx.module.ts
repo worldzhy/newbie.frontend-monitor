@@ -1,4 +1,3 @@
-// src/modules/wx/wx.module.ts
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { RedisModule } from '../../models/redis/redis.module';

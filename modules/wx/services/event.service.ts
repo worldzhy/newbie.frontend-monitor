@@ -1,4 +1,3 @@
-// ts:src/modules/wx/services/event.service.ts
 import { Injectable } from '@nestjs/common';
 import { ClickhouseService } from '../../../models/clickhouse/clickhouse.service';
 

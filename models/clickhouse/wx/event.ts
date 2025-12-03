@@ -1,8 +1,9 @@
 import { DATA_TYPE } from 'clickhouse-orm';
+import { ClickHouseTablePrefix } from '../../enum';
 
 export default function WxEvent(chOrm: any) {
   const schema = {
-    tableName: 'wx_events_',
+    tableName: ClickHouseTablePrefix.WX_EVENT,
     schema: {
       app_id: { type: DATA_TYPE.String }, // App ID
       event: { type: DATA_TYPE.String }, // Event type

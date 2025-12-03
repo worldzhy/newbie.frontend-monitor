@@ -1,4 +1,3 @@
-// ts:/Users/zimv/Documents/code/_coding/monitor/monitor-server-nestjs/src/modules/web/services/report-task.service.ts
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { RedisService } from "../../../models/redis/redis.service";
@@ -7,6 +6,7 @@ import { ClickhouseService } from "../../../models/clickhouse/clickhouse.service
 import { MongoModelsService } from "../../../models/mongo/mongo.service";
 import { func } from "../../../shared/utils";
 import * as UAParser from "ua-parser-js";
+import { RedisKeys } from "../../../models/enum";
 
 @Injectable()
 export class WebReportTaskService {
@@ -27,7 +27,7 @@ export class WebReportTaskService {
     appAjaxs: Record<string, any[]>;
     appErrors: Record<string, any[]>;
   }) {
-    let query: any = await this.redis.rpop("web_repore_datas");
+    let query: any = await this.redis.rpop(RedisKeys.WEB_REPORT_DATAS);
     if (!query) return;
     try {
       query = JSON.parse(query);

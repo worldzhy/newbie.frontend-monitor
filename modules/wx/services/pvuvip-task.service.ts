@@ -1,4 +1,3 @@
-// src/modules/wx/services/pvuvip-task.service.ts
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { SystemService } from "../../../modules/system/system.service";

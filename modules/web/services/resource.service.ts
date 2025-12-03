@@ -1,4 +1,3 @@
-// ts:src/modules/web/services/resource.service.ts
 import { Injectable } from '@nestjs/common';
 import { MongoModelsService } from '../../../models/mongo/mongo.service';
 import { ConfigService } from '@nestjs/config';

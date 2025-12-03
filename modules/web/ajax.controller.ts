@@ -1,4 +1,3 @@
-// src/modules/web/ajax.controller.ts
 import { Controller, Get, Query } from '@nestjs/common';
 import { func } from '../../shared/utils';
 import { AjaxService } from './services/ajax.service';

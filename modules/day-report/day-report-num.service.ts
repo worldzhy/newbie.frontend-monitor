@@ -4,6 +4,7 @@ import { RedisService } from '../../models/redis/redis.service';
 import { ConfigService } from '@nestjs/config';
 import * as moment from 'moment';
 import { func } from '../../shared/utils';
+import { RedisKeyPrefix } from '../../models/enum';
 
 @Injectable()
 export class DayReportNumService {
@@ -22,7 +23,7 @@ export class DayReportNumService {
     const apps = await this.mongo.System().find().read('secondaryPreferred').exec();
 
     for (const app of apps) {
-      const key = `day_report_num_${app.app_id}_${yesterday}`;
+      const key = `${RedisKeyPrefix.DAY_REPORT_NUM}${app.app_id}_${yesterday}`;
       const num = await this.redis.get(key);
       if (!num) continue;
 
@@ -40,7 +41,7 @@ export class DayReportNumService {
   }
 
   async getTodayFromRedis(appId: string, today: number) {
-    return await this.redis.get(`day_report_num_${appId}_${today}`);
+    return await this.redis.get(`${RedisKeyPrefix.DAY_REPORT_NUM}${appId}_${today}`);
   }
 
   async getDayFromMongo(app_id: string, beginTime: string | Date, endTime: string | Date) {
@@ -57,6 +58,6 @@ export class DayReportNumService {
   async redisCount(appId: string) {
     const date = new Date();
     const today = new Date(func.format(date, 'yyyy/MM/dd')).getTime();
-    await this.redis.incr(`day_report_num_${appId}_${today}`);
+    await this.redis.incr(`${RedisKeyPrefix.DAY_REPORT_NUM}${appId}_${today}`);
   }
 }

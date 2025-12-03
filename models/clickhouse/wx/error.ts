@@ -1,8 +1,9 @@
 import { DATA_TYPE } from 'clickhouse-orm';
+import { ClickHouseTablePrefix } from '../../enum';
 
 export default function WxError(chOrm: any) {
   const schema = {
-    tableName: 'wx_errors_',
+    tableName: ClickHouseTablePrefix.WX_ERROR,
     schema: {
       create_time: { type: DATA_TYPE.DateTime, default: Date.now }, // Created time
       msg: { type: DATA_TYPE.String }, // Error message

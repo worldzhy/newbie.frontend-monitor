@@ -1,4 +1,3 @@
-// src/modules/wx/pvuvip.controller.ts
 import { Controller, Get, Query } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { func } from "../../shared/utils";

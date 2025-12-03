@@ -5,6 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { func, getRandomIp } from '../../shared/utils';
 import { DayReportNumService } from '../../modules/day-report/day-report-num.service';
 import { RedisService } from '../../models/redis/redis.service';
+import { RedisKeys } from '../../models/enum';
 
 @Controller('/api/v1')
 export class WebReportController {
@@ -48,10 +49,10 @@ export class WebReportController {
   private async saveWebReportDataForRedis(query: any) {
     const limit = this.config.redis_consumption?.total_limit_web;
     if (limit) {
-      const length = await this.redis.llen('web_repore_datas');
-      if (length >= limit) throw new Error(`reids: web_repore_datas:达到限流（${limit}）`);
+      const length = await this.redis.llen(RedisKeys.WEB_REPORT_DATAS);
+      if (length >= limit) throw new Error(`reids: ${RedisKeys.WEB_REPORT_DATAS}:达到限流（${limit}）`);
     }
-    await this.redis.lpush('web_repore_datas', JSON.stringify(query));
+    await this.redis.lpush(RedisKeys.WEB_REPORT_DATAS, JSON.stringify(query));
     await this.dayReportNum.redisCount(query.appId);
   }
 }

@@ -1,4 +1,3 @@
-// src/modules/wx/page.controller.ts
 import { Controller, Get, Query } from '@nestjs/common';
 import { func } from '../../shared/utils';
 import { WxPageService } from './services/page.service';

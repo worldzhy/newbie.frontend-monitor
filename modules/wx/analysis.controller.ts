@@ -1,4 +1,3 @@
-// src/modules/wx/analysis.controller.ts
 import { Controller, Get, Query } from '@nestjs/common';
 import { func } from '../../shared/utils';
 import { WxAnalysisService } from './services/analysis.service';

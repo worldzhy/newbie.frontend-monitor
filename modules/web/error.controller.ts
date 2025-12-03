@@ -1,4 +1,3 @@
-// src/modules/web/error.controller.ts
 import { Controller, Get, Query } from '@nestjs/common';
 import { func } from '../../shared/utils';
 import { ErrorService } from './services/error.service';

@@ -1,4 +1,3 @@
-// src/modules/wx/services/error.service.ts
 import { Injectable } from '@nestjs/common';
 import { ClickhouseService } from '../../../models/clickhouse/clickhouse.service';
 import { ConfigService } from '@nestjs/config';

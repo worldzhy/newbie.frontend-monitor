@@ -1,4 +1,3 @@
-// src/modules/web/analysis.controller.ts
 import { Controller, Get, Query } from '@nestjs/common';
 import { func } from '../../shared/utils';
 import { AnalysisService } from './services/analysis.service';

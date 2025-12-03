@@ -15,6 +15,7 @@ import { WebPvuvipSchema } from './web/web-pvuvip.schema';
 import { WxPageSchema } from './wx/wx-page.schema';
 import { WxCustomSchema, WxCustomFilterSchema } from './wx/wx-custom.schema';
 import { WxPvuvipSchema } from './wx/wx-pvuvip.schema';
+import { MongoCollectionPrefix, MongoStaticCollection } from '../enum';
 
 @Injectable()
 export class MongoModelsService {
@@ -26,58 +27,58 @@ export class MongoModelsService {
 
   // Static models
   System() {
-    return this.getModel('System', SystemSchema);
+    return this.getModel(MongoStaticCollection.System, SystemSchema);
   }
 
   Email() {
-    return this.getModel('Email', EmailSchema);
+    return this.getModel(MongoStaticCollection.Email, EmailSchema);
   }
 
   DayReportNum() {
-    return this.getModel('DayReportNum', DayReportNumSchema);
+    return this.getModel(MongoStaticCollection.DayReportNum, DayReportNumSchema);
   }
 
   // WEB dynamic models (by appId)
   WebEnvironment(appId: string) {
-    return this.getModel(`web_environment_${appId}`, WebEnvironmentSchema);
+    return this.getModel(`${MongoCollectionPrefix.WEB_ENVIRONMENT}${appId}`, WebEnvironmentSchema);
   }
 
   WebPage(appId: string) {
-    return this.getModel(`web_pages_${appId}`, WebPageSchema);
+    return this.getModel(`${MongoCollectionPrefix.WEB_PAGE}${appId}`, WebPageSchema);
   }
 
   WebResource(appId: string) {
-    return this.getModel(`web_resources_${appId}`, WebResourceSchema);
+    return this.getModel(`${MongoCollectionPrefix.WEB_RESOURCE}${appId}`, WebResourceSchema);
   }
 
   WebCustom(appId: string) {
-    return this.getModel(`web_custom_${appId}`, WebCustomSchema);
+    return this.getModel(`${MongoCollectionPrefix.WEB_CUSTOM}${appId}`, WebCustomSchema);
   }
 
   WebCustomFilter(appId: string) {
-    return this.getModel(`web_custom_filters_${appId}`, WebCustomFilterSchema);
+    return this.getModel(`${MongoCollectionPrefix.WEB_CUSTOM_FILTER}${appId}`, WebCustomFilterSchema);
   }
 
   // WEB pvuvip is static in v4
   WebPvuvip() {
-    return this.getModel('WebPvUvIp', WebPvuvipSchema);
+    return this.getModel(MongoStaticCollection.WebPvUvIp, WebPvuvipSchema);
   }
 
   // WX dynamic models (by appId)
   WxPage(appId: string) {
-    return this.getModel(`wx_pages_${appId}`, WxPageSchema);
+    return this.getModel(`${MongoCollectionPrefix.WX_PAGE}${appId}`, WxPageSchema);
   }
 
   WxCustom(appId: string) {
-    return this.getModel(`wx_custom_${appId}`, WxCustomSchema);
+    return this.getModel(`${MongoCollectionPrefix.WX_CUSTOM}${appId}`, WxCustomSchema);
   }
 
   WxCustomFilter(appId: string) {
-    return this.getModel(`wx_custom_filters_${appId}`, WxCustomFilterSchema);
+    return this.getModel(`${MongoCollectionPrefix.WX_CUSTOM_FILTER}${appId}`, WxCustomFilterSchema);
   }
 
   // WX pvuvip is static in v4
   WxPvuvip() {
-    return this.getModel('WxPvUvIp', WxPvuvipSchema);
+    return this.getModel(MongoStaticCollection.WxPvUvIp, WxPvuvipSchema);
   }
 }

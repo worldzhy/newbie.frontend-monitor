@@ -1,8 +1,9 @@
 import { DATA_TYPE } from 'clickhouse-orm';
+import { ClickHouseTablePrefix } from '../../enum';
 
 export default function WebError(chOrm: any) {
   const schema = {
-    tableName: 'web_errors_',
+    tableName: ClickHouseTablePrefix.WEB_ERROR,
     schema: {
       create_time: { type: DATA_TYPE.DateTime, default: Date.now }, // Created time
       msg: { type: DATA_TYPE.String }, // Error message

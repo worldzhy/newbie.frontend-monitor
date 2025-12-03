@@ -1,4 +1,3 @@
-// src/modules/web/resource.controller.ts
 import { Controller, Get, Query } from '@nestjs/common';
 import { func } from '../../shared/utils';
 import { ResourceService } from './services/resource.service';

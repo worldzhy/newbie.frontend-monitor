@@ -1,4 +1,3 @@
-// ts:src/modules/web/services/analysis.service.ts
 import { Injectable } from '@nestjs/common';
 import { MongoModelsService } from '../../../models/mongo/mongo.service';
 import { ClickhouseService } from '../../../models/clickhouse/clickhouse.service';

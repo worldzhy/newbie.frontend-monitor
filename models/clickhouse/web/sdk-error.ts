@@ -1,8 +1,9 @@
 import { DATA_TYPE } from 'clickhouse-orm';
+import { ClickHouseTablePrefix } from '../../enum';
 
 export default function WebSdkError(chOrm: any) {
   const schema = {
-    tableName: 'web_sdk_errors',
+    tableName: ClickHouseTablePrefix.WEB_SDK_ERROR,
     schema: {
       create_time: { type: DATA_TYPE.DateTime, default: Date.now }, // Created time
       app_id: { type: DATA_TYPE.String }, // App ID

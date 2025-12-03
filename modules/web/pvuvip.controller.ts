@@ -1,4 +1,3 @@
-// src/modules/web/pvuvip.controller.ts
 import { Controller, Get, Query } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { DayReportNumService } from "../../modules/day-report/day-report-num.service";

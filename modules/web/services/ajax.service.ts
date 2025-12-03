@@ -1,4 +1,3 @@
-// ts:src/modules/web/services/ajax.service.ts
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ClickhouseService } from '../../../models/clickhouse/clickhouse.service';

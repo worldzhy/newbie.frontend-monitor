@@ -1,10 +1,10 @@
-// src/modules/wx/report.controller.ts
 import { Controller, Post, Headers, Body } from '@nestjs/common';
 import { SystemService } from '../../modules/system/system.service';
 import { ConfigService } from '@nestjs/config';
 import { RedisService } from '../../models/redis/redis.service';
 import { DayReportNumService } from '../../modules/day-report/day-report-num.service';
 import { func, getRandomIp } from '../../shared/utils';
+import { RedisKeys } from '../../models/enum';
 
 @Controller('/api/v1/wx')
 export class WxReportController {
@@ -34,10 +34,10 @@ export class WxReportController {
 
     const limit = this.config.redis_consumption?.total_limit_wx;
     if (limit) {
-      const length = await this.redis.llen('wx_repore_datas');
-      if (length >= limit) throw new Error(`reids: wx_repore_datas:达到限流（${limit}）`);
+      const length = await this.redis.llen(RedisKeys.WX_REPORT_DATAS);
+      if (length >= limit) throw new Error(`reids: ${RedisKeys.WX_REPORT_DATAS}:达到限流（${limit}）`);
     }
-    await this.redis.lpush('wx_repore_datas', JSON.stringify(query));
+    await this.redis.lpush(RedisKeys.WX_REPORT_DATAS, JSON.stringify(query));
     await this.dayReportNum.redisCount(query.appId);
     return func.result({ data: 'ok' });
   }

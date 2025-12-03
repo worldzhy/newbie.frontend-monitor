@@ -1,4 +1,3 @@
-// src/modules/wx/ajax.controller.ts
 import { Controller, Get, Query } from '@nestjs/common';
 import { func } from '../../shared/utils';
 import { WxAjaxService } from './services/ajax.service';

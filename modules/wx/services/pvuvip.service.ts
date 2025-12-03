@@ -1,4 +1,3 @@
-// src/modules/wx/services/pvuvip.service.ts
 import { Injectable } from "@nestjs/common";
 import { MongoModelsService } from "../../../models/mongo/mongo.service";
 import { ClickhouseService } from "../../../models/clickhouse/clickhouse.service";
