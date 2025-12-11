@@ -40,16 +40,16 @@ export class WebReportTaskService {
       await this.saveSdkError(item);
       return;
     }
-    const system = await this.system.getSystemForAppId(item.app_id);
-    if (!system || system.is_use !== 0) return;
+    const system = await this.system.getSystemForAppId(item.appId);
+    if (!system || system.isUse !== 0) return;
     // TODO querytype === 1
-    if (system.is_statisi_pages === 0 && querytype === 1)
-      await this.savePages(item, system.slow_page_time);
-    if (system.is_statisi_resource === 0 || system.is_statisi_ajax === 0)
+    if (system.isStatisiPages === 0 && querytype === 1)
+      await this.savePages(item, system.slowPageTime);
+    if (system.isStatisiResource === 0 || system.isStatisiAjax === 0)
       this.forEachResources(item, system, appAjaxs);
-    if (system.is_statisi_error === 0)
+    if (system.isStatisiError === 0)
       await this.collectErrors(item, appErrors);
-    if (system.is_statisi_system === 0) await this.saveEnvironment(item);
+    if (system.isStatisiSystem === 0) await this.saveEnvironment(item);
     await this.saveCustoms(item);
   }
 
@@ -64,38 +64,38 @@ export class WebReportTaskService {
     }
     slowPageTime = slowPageTime * 1000;
     const speedType = performance.lodt >= slowPageTime ? 2 : 1;
-    const PageModel = this.mongo.WebPage(item.app_id);
+    const PageModel = this.mongo.WebPage(item.appId);
     const pages = new PageModel();
-    pages.app_id = item.app_id;
-    pages.create_time = item.create_time;
+    pages.appId = item.appId;
+    pages.createTime = item.createTime;
     pages.url = newName;
-    pages.full_url = item.url;
-    pages.pre_url = item.pre_url;
-    pages.speed_type = speedType;
-    pages.is_first_in = item.is_first_in;
-    pages.mark_page = item.mark_page;
-    pages.mark_user = item.mark_user;
-    if (performance.wit !== undefined) pages.white_time = performance.wit;
-    if (performance.dnst !== undefined) pages.dns_time = performance.dnst;
-    if (performance.lodt !== undefined) pages.load_time = performance.lodt;
-    if (performance.reqt !== undefined) pages.request_time = performance.reqt;
-    if (performance.tcpt !== undefined) pages.tcp_time = performance.tcpt;
+    pages.fullUrl = item.url;
+    pages.preUrl = item.preUrl;
+    pages.speedType = speedType;
+    pages.isFirstIn = item.isFirstIn;
+    pages.markPage = item.markPage;
+    pages.markUser = item.markUser;
+    if (performance.wit !== undefined) pages.whiteTime = performance.wit;
+    if (performance.dnst !== undefined) pages.dnsTime = performance.dnst;
+    if (performance.lodt !== undefined) pages.loadTime = performance.lodt;
+    if (performance.reqt !== undefined) pages.requestTime = performance.reqt;
+    if (performance.tcpt !== undefined) pages.tcpTime = performance.tcpt;
     if (performance.andt !== undefined)
-      pages.analysisDom_time = performance.andt;
-    pages.screenwidth = item.screenwidth;
-    pages.screenheight = item.screenheight;
+      pages.analysisDomTime = performance.andt;
+    pages.screenWidth = item.screenWidth;
+    pages.screenHeight = item.screenHeight;
     await pages.save();
   }
 
   private async saveCustoms(data: any) {
     if (!data.customs || !data.customs.length) return;
-    const CustomModel = this.mongo.WebCustom(data.app_id);
+    const CustomModel = this.mongo.WebCustom(data.appId);
     for (const item of data.customs) {
       const customs = new CustomModel();
-      customs.app_id = data.app_id;
-      customs.create_time = data.create_time;
-      customs.mark_page = data.mark_page;
-      customs.mark_user = data.mark_user;
+      customs.appId = data.appId;
+      customs.createTime = data.createTime;
+      customs.markPage = data.markPage;
+      customs.markUser = data.markUser;
       customs.path = "";
       customs.customName = item.customName;
       customs.customContent = item.customContent;
@@ -120,10 +120,10 @@ export class WebReportTaskService {
     let duration = Math.floor(Math.abs(item.duration || 0));
     if (duration > 60000) duration = 60000;
     if (item.type === "link" || item.type === "css")
-      slowTime = (system.slow_css_time || 2) * 1000;
+      slowTime = (system.slowCssTime || 2) * 1000;
     else if (item.type === "script")
-      slowTime = (system.slow_js_time || 2) * 1000;
-    else if (item.type === "img") slowTime = (system.slow_img_time || 2) * 1000;
+      slowTime = (system.slowJsTime || 2) * 1000;
+    else if (item.type === "img") slowTime = (system.slowImgTime || 2) * 1000;
     else slowTime = 2000;
     speedType = duration >= slowTime ? 2 : 1;
     if (duration < slowTime) return;
@@ -134,23 +134,23 @@ export class WebReportTaskService {
     } catch {
       newName = item.name || "";
     }
-    const ResourceModel = this.mongo.WebResource(data.app_id);
+    const ResourceModel = this.mongo.WebResource(data.appId);
     const resours = new ResourceModel();
-    resours.app_id = data.app_id;
-    resours.create_time = data.create_time;
+    resours.appId = data.appId;
+    resours.createTime = data.createTime;
     resours.url = data.url;
-    resours.full_url = item.name;
-    resours.speed_type = speedType;
+    resours.fullUrl = item.name;
+    resours.speedType = speedType;
     resours.name = newName;
     resours.method = item.method;
     resours.type = item.type;
     resours.duration = duration;
-    resours.decoded_body_size = item.decodedBodySize
-      ? Number(item.decodedBodySize)
+    resours.bodySize = item.bodySize
+      ? Number(item.bodySize)
       : 0;
-    resours.next_hop_protocol = item.nextHopProtocol;
-    resours.mark_page = data.mark_page;
-    resours.mark_user = data.mark_user;
+    resours.nextHopProtocol = item.nextHopProtocol;
+    resours.markPage = data.markPage;
+    resours.markUser = data.markUser;
     this.setUser(resours, data);
     await resours.save();
   }
@@ -167,24 +167,24 @@ export class WebReportTaskService {
     } catch {
       datas = null;
     }
-    const EnvModel = this.mongo.WebEnvironment(data.app_id);
+    const EnvModel = this.mongo.WebEnvironment(data.appId);
     const environment = new EnvModel();
-    environment.app_id = data.app_id;
-    environment.create_time = data.create_time;
+    environment.appId = data.appId;
+    environment.createTime = data.createTime;
     environment.url = data.url;
-    environment.mark_page = data.mark_page;
-    environment.mark_user = data.mark_user;
-    environment.mark_uv = data.mark_uv;
-    if (data.mark_device) environment.mark_device = data.mark_device;
+    environment.markPage = data.markPage;
+    environment.markUser = data.markUser;
+    environment.markUv = data.markUv;
+    if (data.markDevice) environment.markDevice = data.markDevice;
     this.setUser(environment, data);
 
     const parser = new UAParser();
-    parser.setUA(data.user_agent);
+    parser.setUA(data.userAgent);
     const result = parser.getResult();
     environment.browser = result?.browser?.name || "";
-    environment.borwser_version = result?.browser?.version || "";
+    environment.browserVersion = result?.browser?.version || "";
     environment.system = result?.os?.name || "";
-    environment.system_version = result?.os?.version || "";
+    environment.systemVersion = result?.os?.version || "";
 
     environment.ip = data.ip;
     environment.county = data.county;
@@ -199,22 +199,22 @@ export class WebReportTaskService {
   private async saveSdkError(data: any) {
     const model = await this.ch.WebSdkError();
     const sdkErr = model.build();
-    sdkErr.app_id = data.app_id;
-    sdkErr.create_time = data.create_time;
-    sdkErr.mark_user = data.mark_user;
-    sdkErr.sdk_v = data.sdk_v;
+    sdkErr.appId = data.appId;
+    sdkErr.createTime = data.createTime;
+    sdkErr.markUser = data.markUser;
+    sdkErr.sdkVersion = data.sdkVersion;
     this.setUser(sdkErr, data);
     sdkErr.name = data.name;
     sdkErr.msg = data.msg;
     sdkErr.stack = data.stack;
 
     const parser = new UAParser();
-    parser.setUA(data.user_agent);
+    parser.setUA(data.userAgent);
     const result = parser.getResult();
     sdkErr.browser = result?.browser?.name || "";
-    sdkErr.borwser_version = result?.browser?.version || "";
+    sdkErr.browserVersion = result?.browser?.version || "";
     sdkErr.system = result?.os?.name || "";
-    sdkErr.system_version = result?.os?.version || "";
+    sdkErr.systemVersion = result?.os?.version || "";
 
     await sdkErr.save();
   }
@@ -244,32 +244,32 @@ export class WebReportTaskService {
   private async handleWebData(query: any) {
     const type = query.type || 1;
     let item: any = {
-      app_id: query.appId,
-      create_time: new Date(query.time),
-      user_agent: query.user_agent,
+      appId: query.appId,
+      createTime: new Date(query.time),
+      userAgent: query.userAgent,
       ip: query.ip,
-      mark_page: query.markPage || func.randomString(),
-      mark_user: query.markUser || "",
-      mark_uv: query.markUv || "",
-      mark_device: query.markDevice || "",
+      markPage: query.markPage || func.randomString(),
+      markUser: query.markUser || "",
+      markUv: query.markUv || "",
+      markDevice: query.markDevice || "",
       url: query.url,
       p: query.p,
       uid: query.uid,
     };
     if (type === 1) {
       item = Object.assign(item, {
-        is_first_in: query.isFristIn ? 2 : 1,
-        pre_url: query.preUrl,
+        isFirstIn: query.isFirstIn ? 2 : 1,
+        preUrl: query.preUrl,
         performance: query.performance,
-        error_list: query.errorList,
-        resource_list: query.resourceList,
-        screenwidth: query.screenwidth,
-        screenheight: query.screenheight,
+        errorList: query.errorList,
+        resourceList: query.resourceList,
+        screenWidth: query.screenWidth,
+        screenHeight: query.screenHeight,
       });
     } else if (type === 2 || type === 3 || type === 4 || type === 5) {
       item = Object.assign(item, {
-        error_list: query.errorList,
-        resource_list: query.resourceList,
+        errorList: query.errorList,
+        resourceList: query.resourceList,
         customs: query.customs,
       });
     }
@@ -281,16 +281,16 @@ export class WebReportTaskService {
     system: any,
     appAjaxs: Record<string, any[]>
   ) {
-    if (!data.resource_list || !data.resource_list.length) return;
-    data.resource_list.forEach((item: any) => {
+    if (!data.resourceList || !data.resourceList.length) return;
+    data.resourceList.forEach((item: any) => {
       if (
         item.type === "xmlhttprequest" ||
         item.type === "fetchrequest" ||
         item.type === "fetch"
       ) {
-        if (system.is_statisi_ajax === 0) this.saveAjaxs(data, item, appAjaxs);
+        if (system.isStatisiAjax === 0) this.saveAjaxs(data, item, appAjaxs);
       } else {
-        if (system.is_statisi_resource === 0)
+        if (system.isStatisiResource === 0)
           this.saveResours(data, item, system);
       }
     });
@@ -310,38 +310,38 @@ export class WebReportTaskService {
     }
     const duration = Math.floor(Math.abs(item.duration || 0));
 
-    const model = await this.ch.WebAjax(data.app_id);
+    const model = await this.ch.WebAjax(data.appId);
     const _ajax = model.build();
-    _ajax.app_id = data.app_id;
-    _ajax.create_time = data.create_time;
+    _ajax.appId = data.appId;
+    _ajax.createTime = data.createTime;
     _ajax.url = newName || "";
-    _ajax.full_url = item.name || "";
+    _ajax.fullUrl = item.name || "";
     _ajax.method = item.method || "";
     _ajax.duration = duration;
-    _ajax.decoded_body_size = item.decodedBodySize
-      ? Number(item.decodedBodySize)
+    _ajax.bodySize = item.bodySize
+      ? Number(item.bodySize)
       : 0;
-    _ajax.call_url = data.url || "";
+    _ajax.callUrl = data.url || "";
     if (item.options) _ajax.options = func.filterKeyWord(item.options);
     try {
       const newurl = new URL(item.name);
       if (newurl.searchParams.toString())
         _ajax.query = newurl.searchParams.toString();
     } catch {}
-    if (item.traceId) _ajax.trace_id = item.traceId;
+    if (item.traceId) _ajax.traceId = item.traceId;
     if (data.uid) _ajax.uid = String(data.uid);
     if (data.p) _ajax.phone = func.decryptPhone(data.p);
-    _ajax.mark_page = data.mark_page || "";
-    _ajax.mark_user = data.mark_user || "";
+    _ajax.markPage = data.markPage || "";
+    _ajax.markUser = data.markUser || "";
 
-    const bucket = appAjaxs[data.app_id];
+    const bucket = appAjaxs[data.appId];
     if (bucket) bucket.push(_ajax);
-    else appAjaxs[data.app_id] = [_ajax];
+    else appAjaxs[data.appId] = [_ajax];
   }
 
   private async collectErrors(data: any, appErrors: Record<string, any[]>) {
-    if (!data.error_list || !data.error_list.length) return;
-    for (const item of data.error_list) {
+    if (!data.errorList || !data.errorList.length) return;
+    for (const item of data.errorList) {
       if (
         item?.data?.resourceUrl &&
         item.data.resourceUrl.startsWith("data://image")
@@ -356,18 +356,18 @@ export class WebReportTaskService {
         newName = item?.data?.resourceUrl || "";
       }
 
-      const model = await this.ch.WebError(data.app_id);
+      const model = await this.ch.WebError(data.appId);
       const errors = model.build();
-      errors.resource_url = newName || "";
-      errors.full_url = item?.data?.resourceUrl || "";
+      errors.resourceUrl = newName || "";
+      errors.fullUrl = item?.data?.resourceUrl || "";
       errors.url = data.url || "";
-      errors.create_time = item.t ? new Date(item.t) : data.create_time;
+      errors.createTime = item.createTime ? new Date(item.createTime) : data.createTime;
 
       if (typeof item.msg === "object") errors.msg = JSON.stringify(item.msg);
       else if (typeof item.msg === "string") errors.msg = item.msg;
       else errors.msg = item.msg || "";
 
-      errors.type = item.n || "";
+      errors.type = item.type || "";
       errors.name = item.name || "";
       errors.api = item.api || "";
       if (Array.isArray(item.stack)) errors.stack = JSON.stringify(item.stack);
@@ -382,16 +382,16 @@ export class WebReportTaskService {
         if (u.searchParams.toString()) errors.query = u.searchParams.toString();
       } catch {}
       if (item.options) errors.options = func.filterKeyWord(item.options);
-      if (item.traceId) errors.trace_id = item.traceId;
+      if (item.traceId) errors.traceId = item.traceId;
 
-      errors.mark_page = data.mark_page || "";
-      errors.mark_user = data.mark_user || "";
+      errors.markPage = data.markPage || "";
+      errors.markUser = data.markUser || "";
       if (data.uid) errors.uid = String(data.uid);
       if (data.p) errors.phone = func.decryptPhone(data.p);
 
-      const bucket = appErrors[data.app_id];
+      const bucket = appErrors[data.appId];
       if (bucket) bucket.push(errors);
-      else appErrors[data.app_id] = [errors];
+      else appErrors[data.appId] = [errors];
     }
   }
 }

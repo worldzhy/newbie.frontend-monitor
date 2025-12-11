@@ -7,7 +7,7 @@ export class EnvironmentService {
 
   async getDataGroupBy(type: number, url: string, appId: string, beginTime?: string, endTime?: string) {
     const match: any = { url };
-    if (beginTime && endTime) match.create_time = { $gte: new Date(beginTime), $lte: new Date(endTime) };
+    if (beginTime && endTime) match.createTime = { $gte: new Date(beginTime), $lte: new Date(endTime) };
     const group_id = {
       url: '$url',
       city: `${type === 1 ? '$city' : ''}`,
@@ -24,6 +24,6 @@ export class EnvironmentService {
   }
 
   async getEnvironmentForPage(appId: string, markPage: string) {
-    return await this.mongo.WebEnvironment(appId).findOne({ mark_page: markPage }).read('secondaryPreferred').exec();
+    return await this.mongo.WebEnvironment(appId).findOne({ markPage }).read('secondaryPreferred').exec();
   }
 }

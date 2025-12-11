@@ -21,14 +21,14 @@ export class WxAnalysisService {
     const query: any = { $match: {} };
     if (filter?.phone) query.$match.phone = filter.phone;
     if (filter?.uid) query.$match.uid = filter.uid;
-    const create_time: any = {};
+    const createTime: any = {};
     if (beginTime) {
-      create_time.$gte = new Date(beginTime);
-      query.$match.create_time = create_time;
+      createTime.$gte = new Date(beginTime);
+      query.$match.createTime = createTime;
     }
     if (endTime) {
-      create_time.$lte = new Date(endTime);
-      query.$match.create_time = create_time;
+      createTime.$lte = new Date(endTime);
+      query.$match.createTime = createTime;
     }
     return await this.fixDistinct(appId, query);
   }
@@ -40,8 +40,8 @@ export class WxAnalysisService {
         query,
         {
           $group: {
-            _id: { markuser: "$mark_user" },
-            visitTime: { $first: "$create_time" },
+            _id: { markUser: "$markUser" },
+            visitTime: { $first: "$createTime" },
           },
         },
         { $sort: { visitTime: 1 } },
@@ -51,12 +51,12 @@ export class WxAnalysisService {
     return { list: result };
   }
 
-  async getAnalysisOneList(appId: string, markuser: string) {
+  async getAnalysisOneList(appId: string, markUser: string) {
     return await this.mongo
       .WxPage(appId)
-      .find({ mark_user: markuser })
+      .find({ markUser })
       .read("secondaryPreferred")
-      .sort({ create_time: 1 })
+      .sort({ createTime: 1 })
       .exec();
   }
 
@@ -115,7 +115,7 @@ export class WxAnalysisService {
         { $match: $match },
         {
           $group: {
-            _id: { mark_user: "$mark_user" },
+            _id: { markUser: "$markUser" },
             paths: { $push: "$path" },
             count: { $sum: 1 },
           },
@@ -183,14 +183,14 @@ export class WxAnalysisService {
 
   private getMatch(beginTime?: string, endTime?: string) {
     const $match: any = {};
-    const create_time: any = {};
+    const createTime: any = {};
     if (beginTime) {
-      create_time.$gte = new Date(beginTime);
-      $match.create_time = create_time;
+      createTime.$gte = new Date(beginTime);
+      $match.createTime = createTime;
     }
     if (endTime) {
-      create_time.$lte = new Date(endTime);
-      $match.create_time = create_time;
+      createTime.$lte = new Date(endTime);
+      $match.createTime = createTime;
     }
     return $match;
   }

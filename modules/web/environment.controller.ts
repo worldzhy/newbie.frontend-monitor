@@ -18,8 +18,8 @@ export class EnvironmentController {
   @Get('/getEnvironmentForPage')
   async getEnvironmentForPage(@Query() q: any) {
     const { appId, markPage } = q;
-    if (!appId) throw new Error('根据mark_page获得用户系统信息：appId不能为空');
-    if (!markPage) throw new Error('根据mark_page获得用户系统信息：markPage不能为空');
+    if (!appId) throw new Error('根据markPage获得用户系统信息：appId不能为空');
+    if (!markPage) throw new Error('根据markPage获得用户系统信息：markPage不能为空');
     const result = await this.envSrv.getEnvironmentForPage(appId, markPage);
     return func.result({ data: result });
   }

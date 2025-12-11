@@ -15,7 +15,7 @@ export class WxReportController {
     private readonly redis: RedisService,
     private readonly dayReportNum: DayReportNumService
   ) {
-    this.config = this.configService.get('frontend-monitor');
+    this.config = this.configService.get('microservices.frontend-monitor');
   }
 
   @Post('/report/wx')
@@ -24,11 +24,11 @@ export class WxReportController {
     if (headers['content-type'] && headers['content-type'].includes('text/plain')) {
       query = JSON.parse(body as string);
     }
-    if (!query.appId) throw new Error('wx端上报数据操作：app_id不能为空');
+    if (!query.appId) throw new Error('wx端上报数据操作：appId不能为空');
 
     query.ip = func.getRealIp(headers as any);
     const system = await this.system.getSystemForAppId(query.appId);
-    if (!system?.app_id) throw new Error(`appId:${query.appId} 不存在`);
+    if (!system?.appId) throw new Error(`appId:${query.appId} 不存在`);
 
     if (this.config.isLocalDev) query.ip = getRandomIp();
 

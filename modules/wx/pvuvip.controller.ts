@@ -71,8 +71,8 @@ export class WxPvuvipController {
     const betweenTime = Math.abs(new Date(timer).getTime() - timestrat);
     const b = beginTime || new Date(timestrat - betweenTime * 30);
     const e = endTime || new Date(timestrat);
-    const datalist = (await this.wxPvuvip.getPvUvIpData(appId, b, e)) || [];
-    const result = await this.wxPvuvip.getTimeList(b, e, datalist, betweenTime);
+    const dataList = (await this.wxPvuvip.getPvUvIpData(appId, b, e)) || [];
+    const result = await this.wxPvuvip.getTimeList(b, e, dataList, betweenTime);
     return func.result({ time: betweenTime, data: result });
   }
 
@@ -86,16 +86,16 @@ export class WxPvuvipController {
     interval.prev();
     const e = endTime || new Date(interval.prev().toString());
     const b = beginTime || new Date(interval.prev().toString());
-    const datalist = (await this.wxPvuvip.getPvUvIpData(appId, b, e)) || [];
+    const dataList = (await this.wxPvuvip.getPvUvIpData(appId, b, e)) || [];
     let result: any = {};
-    if (datalist.length) {
+    if (dataList.length) {
       result = {
-        time: datalist[0].create_time,
-        pv: datalist[0].pv || 0,
-        uv: datalist[0].uv || 0,
-        ip: datalist[0].ip || 0,
-        ajax: datalist[0].ajax || 0,
-        flow: Math.floor((datalist[0].flow || 0) / 1024 / 1024),
+        time: dataList[0].createTime,
+        pv: dataList[0].pv || 0,
+        uv: dataList[0].uv || 0,
+        ip: dataList[0].ip || 0,
+        ajax: dataList[0].ajax || 0,
+        flow: Math.floor((dataList[0].flow || 0) / 1024 / 1024),
       };
     } else {
       result = {

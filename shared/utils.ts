@@ -56,10 +56,18 @@ export const func = {
   getRealIp(headers: Record<string, any>, ip?: string) {
     return headers['x-real-ip'] || headers['x-forwarded-for'] || ip;
   },
+  // 简化：将路径段中的纯数字替换为 *
   urlHelper(input: string) {
     try {
-      // 简化：将路径段中的纯数字替换为 *
-      return input.replace(/\/\d+(\b)/g, '/*$1');
+      const schemeIdx = input.indexOf('://');
+      if (schemeIdx !== -1) {
+        const pathStart = input.indexOf('/', schemeIdx + 3);
+        if (pathStart === -1) return input;
+        const head = input.slice(0, pathStart);
+        const path = input.slice(pathStart).replace(/\/\d+\b/g, '/*');
+        return head + path;
+      }
+      return input.replace(/\/\d+\b/g, '/*');
     } catch {
       return input;
     }
@@ -91,14 +99,14 @@ export const func = {
       .join('');
   },
   setMatchTime(query, $match) {
-    const create_time: any = {};
+    const createTime: any = {};
     if (query.beginTime) {
-      create_time.$gte = new Date(query.beginTime);
-      $match.create_time = create_time;
+      createTime.$gte = new Date(query.beginTime);
+      $match.createTime = createTime;
     }
     if (query.endTime) {
-      create_time.$lte = new Date(query.endTime);
-      $match.create_time = create_time;
+      createTime.$lte = new Date(query.endTime);
+      $match.createTime = createTime;
     }
   },
 };

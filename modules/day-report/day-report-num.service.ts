@@ -14,7 +14,7 @@ export class DayReportNumService {
     private readonly redis: RedisService,
     private readonly configService: ConfigService
   ) {
-    this.cfg = this.configService.get('frontend-monitor');
+    this.cfg = this.configService.get('microservices.frontend-monitor');
   }
 
   async numCountTask() {
@@ -23,16 +23,16 @@ export class DayReportNumService {
     const apps = await this.mongo.System().find().read('secondaryPreferred').exec();
 
     for (const app of apps) {
-      const key = `${RedisKeyPrefix.DAY_REPORT_NUM}${app.app_id}_${yesterday}`;
+      const key = `${RedisKeyPrefix.DAY_REPORT_NUM}${app.appId}_${yesterday}`;
       const num = await this.redis.get(key);
       if (!num) continue;
 
       const DayModel = this.mongo.DayReportNum();
       const repore = new DayModel();
-      repore.app_id = app.app_id;
+      repore.appId = app.appId;
       repore.type = app.type;
-      repore.day_time = new Date(yesterday);
-      repore.create_time = new Date();
+      repore.dayTime = new Date(yesterday);
+      repore.createTime = new Date();
       repore.num = Number(num);
       await repore.save();
 
@@ -44,15 +44,15 @@ export class DayReportNumService {
     return await this.redis.get(`${RedisKeyPrefix.DAY_REPORT_NUM}${appId}_${today}`);
   }
 
-  async getDayFromMongo(app_id: string, beginTime: string | Date, endTime: string | Date) {
+  async getDayFromMongo(appId: string, beginTime: string | Date, endTime: string | Date) {
     const query = {
-      app_id,
-      day_time: {
+      appId,
+      dayTime: {
         $gte: new Date(moment(beginTime).format('YYYY-MM-DD 00:00:00')),
         $lte: new Date(moment(endTime).format('YYYY-MM-DD 23:59:59'))
       }
     };
-    return (await this.mongo.DayReportNum().findOne(query, { num: 1, day_time: 1 }).read('secondaryPreferred').exec()) || ({} as any);
+    return (await this.mongo.DayReportNum().findOne(query, { num: 1, dayTime: 1 }).read('secondaryPreferred').exec()) || ({} as any);
   }
 
   async redisCount(appId: string) {

@@ -20,11 +20,11 @@ export class PageService {
       pageNo = 1,
       pageSize = this.cfg.pageSize,
       url,
-      is_first_in = 1,
+      isFirstIn = 1,
     } = query;
-    const match: any = { is_first_in: Number(is_first_in) };
+    const match: any = { isFirstIn: Number(isFirstIn) };
     func.setMatchTime(query, match);
-    if (type) match.speed_type = Number(type);
+    if (type) match.speedType = Number(type);
     if (url) match.url = { $regex: new RegExp(url, "i") };
     const group_id = { url: "$url" };
     return url
@@ -62,12 +62,12 @@ export class PageService {
             $group: {
               _id: { url: "$url" },
               count: { $sum: 1 },
-              load_time: { $avg: "$load_time" },
-              dns_time: { $avg: "$dns_time" },
-              tcp_time: { $avg: "$tcp_time" },
-              white_time: { $avg: "$white_time" },
-              request_time: { $avg: "$request_time" },
-              analysisDom_time: { $avg: "$analysisDom_time" },
+              loadTime: { $avg: "$loadTime" },
+              dnsTime: { $avg: "$dnsTime" },
+              tcpTime: { $avg: "$tcpTime" },
+              whiteTime: { $avg: "$whiteTime" },
+              requestTime: { $avg: "$requestTime" },
+              analysisDomTime: { $avg: "$analysisDomTime" },
             },
           },
         ])
@@ -76,7 +76,7 @@ export class PageService {
     );
     const all = await Promise.all(jobs);
     const result = all.map((item) => item?.[0]).filter(Boolean);
-    return { datalist: result, totalNum: copdistinct.length, pageNo };
+    return { dataList: result, totalNum: copdistinct.length, pageNo };
   }
 
   private async oneThread(
@@ -91,7 +91,7 @@ export class PageService {
       .distinct("url", match)
       .read("secondaryPreferred")
       .exec();
-    const datalist = await this.mongo
+    const dataList = await this.mongo
       .WebPage(appId)
       .aggregate([
         { $match: match },
@@ -99,14 +99,14 @@ export class PageService {
           $group: {
             _id: group_id,
             count: { $sum: 1 },
-            load_time: { $avg: "$load_time" },
-            dns_time: { $avg: "$dns_time" },
-            tcp_time: { $avg: "$tcp_time" },
-            dom_time: { $avg: "$dom_time" },
-            white_time: { $avg: "$white_time" },
-            request_time: { $avg: "$request_time" },
-            analysisDom_time: { $avg: "$analysisDom_time" },
-            ready_time: { $avg: "$ready_time" },
+            loadTime: { $avg: "$loadTime" },
+            dnsTime: { $avg: "$dnsTime" },
+            tcpTime: { $avg: "$tcpTime" },
+            domTime: { $avg: "$domTime" },
+            whiteTime: { $avg: "$whiteTime" },
+            requestTime: { $avg: "$requestTime" },
+            analysisDomTime: { $avg: "$analysisDomTime" },
+            readyTime: { $avg: "$readyTime" },
           },
         },
         { $skip: (pageNo - 1) * pageSize },
@@ -115,13 +115,13 @@ export class PageService {
       ])
       .read("secondaryPreferred")
       .exec();
-    return { datalist, totalNum: count.length, pageNo };
+    return { dataList, totalNum: count.length, pageNo };
   }
 
   async getRealTimeAveragePageList(query: any) {
     const { appId, type = "", beginTime, endTime } = query;
-    const match: any = { is_first_in: 2 };
-    if (type) match.speed_type = Number(type);
+    const match: any = { isFirstIn: 2 };
+    if (type) match.speedType = Number(type);
     const _querys: any = this.getSpaceTime(beginTime, endTime, 60000);
     const result = await this.mongo
       .WebPage(appId)
@@ -130,37 +130,37 @@ export class PageService {
         {
           $group: {
             _id: {
-              year: { $year: "$create_time" },
-              dayOfMonth: { $dayOfMonth: "$create_time" },
-              month: { $month: "$create_time" },
-              hour: { $hour: "$create_time" },
+              year: { $year: "$createTime" },
+              dayOfMonth: { $dayOfMonth: "$createTime" },
+              month: { $month: "$createTime" },
+              hour: { $hour: "$createTime" },
               interval: {
                 $subtract: [
-                  { $minute: "$create_time" },
-                  { $mod: [{ $minute: "$create_time" }, 1] },
+                  { $minute: "$createTime" },
+                  { $mod: [{ $minute: "$createTime" }, 1] },
                 ],
               },
             },
             count: { $sum: 1 },
-            create_time: { $addToSet: "$create_time" },
-            load_time: { $avg: "$load_time" },
-            dns_time: { $avg: "$dns_time" },
-            tcp_time: { $avg: "$tcp_time" },
-            white_time: { $avg: "$white_time" },
-            request_time: { $avg: "$request_time" },
-            analysisDom_time: { $avg: "$analysisDom_time" },
+            createTime: { $addToSet: "$createTime" },
+            loadTime: { $avg: "$loadTime" },
+            dnsTime: { $avg: "$dnsTime" },
+            tcpTime: { $avg: "$tcpTime" },
+            whiteTime: { $avg: "$whiteTime" },
+            requestTime: { $avg: "$requestTime" },
+            analysisDomTime: { $avg: "$analysisDomTime" },
           },
         },
         {
           $project: {
             count: "$count",
-            create_time: { $slice: ["$create_time", 0, 1] },
-            load_time: "$load_time",
-            dns_time: "$dns_time",
-            tcp_time: "$tcp_time",
-            white_time: "$white_time",
-            request_time: "$request_time",
-            analysisDom_time: "$analysisDom_time",
+            createTime: { $slice: ["$createTime", 0, 1] },
+            loadTime: "$loadTime",
+            dnsTime: "$dnsTime",
+            tcpTime: "$tcpTime",
+            whiteTime: "$whiteTime",
+            requestTime: "$requestTime",
+            analysisDomTime: "$analysisDomTime",
           },
         },
       ])
@@ -168,7 +168,7 @@ export class PageService {
       .exec();
     for (let i = 0; i < _querys.length; i++) {
       for (let r_i = 0; r_i < result.length; r_i++) {
-        const rDate = new Date(result[r_i].create_time).getTime();
+        const rDate = new Date(result[r_i].createTime).getTime();
         if (rDate > _querys[i].beginTime && rDate < _querys[i].endTime) {
           _querys[i].result = result[r_i];
           result.splice(r_i, 1);
@@ -181,11 +181,11 @@ export class PageService {
       beginTime: func.format(new Date(item.beginTime), "yyyy/MM/dd hh:mm"),
       endTime: func.format(new Date(item.endTime), "yyyy/MM/dd hh:mm"),
       count: item.result ? item.result.count : 0,
-      dns_time: item.result ? item.result.dns_time : 0,
-      load_time: item.result ? item.result.load_time : 0,
-      request_time: item.result ? item.result.request_time : 0,
-      tcp_time: item.result ? item.result.tcp_time : 0,
-      white_time: item.result ? item.result.white_time : 0,
+      dnsTime: item.result ? item.result.dnsTime : 0,
+      loadTime: item.result ? item.result.loadTime : 0,
+      requestTime: item.result ? item.result.requestTime : 0,
+      tcpTime: item.result ? item.result.tcpTime : 0,
+      whiteTime: item.result ? item.result.whiteTime : 0,
     }));
   }
 
@@ -200,10 +200,10 @@ export class PageService {
       beginTime,
       endTime,
     } = query;
-    const match: any = { url, is_first_in: Number(firstIn) };
-    if (type) match.speed_type = Number(type);
+    const match: any = { url, isFirstIn: Number(firstIn) };
+    if (type) match.speedType = Number(type);
     if (beginTime && endTime)
-      match.create_time = {
+      match.createTime = {
         $gte: new Date(beginTime),
         $lte: new Date(endTime),
       };
@@ -212,17 +212,17 @@ export class PageService {
       .count(match)
       .read("secondaryPreferred")
       .exec();
-    const datalist = await this.mongo
+    const dataList = await this.mongo
       .WebPage(appId)
       .aggregate([
         { $match: match },
-        { $sort: { create_time: -1 } },
+        { $sort: { createTime: -1 } },
         { $skip: (Number(pageNo) - 1) * Number(pageSize) },
         { $limit: Number(pageSize) },
       ])
       .read("secondaryPreferred")
       .exec();
-    return { datalist, totalNum: count, pageNo: Number(pageNo) };
+    return { dataList, totalNum: count, pageNo: Number(pageNo) };
   }
 
   async getPageDetails(appId: string, id: string) {

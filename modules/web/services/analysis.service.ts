@@ -14,19 +14,19 @@ export class AnalysisService {
     const query: any = { $match: {} };
     if (filter?.phone) query.$match.phone = filter.phone;
     if (filter?.uid) query.$match.uid = filter.uid;
-    const create_time: any = {};
-    if (beginTime) { create_time.$gte = new Date(beginTime); query.$match.create_time = create_time; }
-    if (endTime) { create_time.$lte = new Date(endTime); query.$match.create_time = create_time; }
+    const createTime: any = {};
+    if (beginTime) { createTime.$gte = new Date(beginTime); query.$match.createTime = createTime; }
+    if (endTime) { createTime.$lte = new Date(endTime); query.$match.createTime = createTime; }
     const result = await this.mongo.WebEnvironment(appId).aggregate([
       query,
-      { $group: { _id: { markuser: '$mark_user' }, visitTime: { $first: '$create_time' } } },
+      { $group: { _id: { markUser: '$markUser' }, visitTime: { $first: '$createTime' } } },
       { $sort: { visitTime: 1 } }
     ]).read('secondaryPreferred').exec();
     return { list: result };
   }
 
-  async getAnalysisOneList(appId: string, markuser: string) {
-    return await this.mongo.WebEnvironment(appId).find({ mark_user: markuser }).read('secondaryPreferred').sort({ create_time: 1 }).exec();
+  async getAnalysisOneList(appId: string, markUser: string) {
+    return await this.mongo.WebEnvironment(appId).find({ markUser }).read('secondaryPreferred').sort({ createTime: 1 }).exec();
   }
 
   async getTopDatas(appId: string, beginTime?: string, endTime?: string) {
@@ -44,9 +44,9 @@ export class AnalysisService {
 
   private getMatch(beginTime?: string, endTime?: string) {
     const $match: any = {};
-    const create_time: any = {};
-    if (beginTime) { create_time.$gte = new Date(beginTime); $match.create_time = create_time; }
-    if (endTime) { create_time.$lte = new Date(endTime); $match.create_time = create_time; }
+    const createTime: any = {};
+    if (beginTime) { createTime.$gte = new Date(beginTime); $match.createTime = createTime; }
+    if (endTime) { createTime.$lte = new Date(endTime); $match.createTime = createTime; }
     return $match;
   }
 
@@ -64,7 +64,7 @@ export class AnalysisService {
     const $match = this.getMatch(beginTime, endTime);
     return await this.mongo.WebEnvironment(appId).aggregate([
       { $match: $match },
-      { $group: { _id: { mark_user: '$mark_user' }, urls: { $push: '$url' }, count: { $sum: 1 } } },
+      { $group: { _id: { markUser: '$markUser' }, urls: { $push: '$url' }, count: { $sum: 1 } } },
       { $match: { count: 1 } },
       { $group: { _id: { value: { $arrayElemAt: ['$urls', 0] } }, count: { $sum: 1 } } },
       { $sort: { count: -1 } },

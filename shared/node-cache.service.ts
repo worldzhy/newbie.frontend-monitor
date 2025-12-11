@@ -22,6 +22,6 @@ export class NodeCacheService {
   }
 
   updateSystemCache(system: SystemDocument) {
-    this.setAppInfo(system.app_id, system);
+    this.setAppInfo(system.appId, system);
   }
 }

@@ -16,10 +16,10 @@ export class WxAnalysisController {
 
   @Get('/getAnalysisOneList')
   async getAnalysisOneList(@Query() q: any) {
-    const { appId, markuser } = q;
+    const { appId, markUser } = q;
     if (!appId) throw new Error('单个用户行为轨迹列表：appId不能为空');
-    if (!markuser) throw new Error('单个用户行为轨迹列表：markuser不能为空');
-    const result = await this.wxAnalysis.getAnalysisOneList(appId, markuser);
+    if (!markUser) throw new Error('单个用户行为轨迹列表：markUser不能为空');
+    const result = await this.wxAnalysis.getAnalysisOneList(appId, markUser);
     const newR: any[] = [];
     result.map((item: any, i: number) => {
       if (i === 0) newR.push(item);

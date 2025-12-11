@@ -23,8 +23,8 @@ export class WxIpTaskService {
     const systems = await this.system.getWxSystemList();
     if (!systems || !systems.length) return;
     for (const sys of systems) {
-      const appId = sys.app_id;
-      if (!appId || sys.is_use !== 0) continue;
+      const appId = sys.appId;
+      if (!appId || sys.isUse !== 0) continue;
       await this.saveWxGetIpDatasByOne(appId);
     }
   }
@@ -33,7 +33,7 @@ export class WxIpTaskService {
     try {
       const query: any = { city: { $exists: false } };
       const beginTime = await this.redis.get(`${RedisKeyPrefix.WX_IP_TASK_BEGIN_TIME}${appId}`);
-      query.create_time = {
+      query.createTime = {
         $gt: beginTime
           ? new Date(beginTime)
           : new Date(Date.now() - this.cfg.ip_task_space_time),
@@ -43,7 +43,7 @@ export class WxIpTaskService {
         .find(query)
         .read("secondaryPreferred")
         .limit(this.cfg.ip_thread * 60)
-        .sort({ create_time: 1 })
+        .sort({ createTime: 1 })
         .exec();
       if (datas && datas.length) {
         for (let i = 0; i < this.cfg.ip_thread; i++) {
@@ -65,17 +65,19 @@ export class WxIpTaskService {
     if (!data || !data.length) return;
     for (let i = 0; i < data.length; i++) {
       const ip = data[i].ip;
-      await this.getIpData(ip, data[i]._id, data[i].app_id);
+      await this.getIpData(ip, data[i]._id, data[i].appId);
     }
     if (lastLen === 0) {
       await this.redis.set(
         `${RedisKeyPrefix.WX_IP_TASK_BEGIN_TIME}${appId}`,
-        data[data.length - 1].create_time
+        data[data.length - 1].createTime
       );
     }
   }
 
   private async getIpData(ip: string, _id: string, appId: string) {
+    if(!ip) return;
+
     let _copyip = ip.split(".");
     const copyip = `${_copyip[0]}.${_copyip[1]}.${_copyip[2]}`;
     let datas = await this.redis.get(copyip);

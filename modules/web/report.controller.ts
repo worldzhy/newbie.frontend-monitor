@@ -17,7 +17,7 @@ export class WebReportController {
     private readonly dayReportNum: DayReportNumService,
     private readonly redis: RedisService
   ) {
-    this.config = this.configService.get('frontend-monitor');
+    this.config = this.configService.get('microservices.frontend-monitor');
   }
 
   @Post('/report/web')
@@ -31,16 +31,16 @@ export class WebReportController {
     if (req.headers['content-type'] && req.headers['content-type'].includes('text/plain')) {
       query = JSON.parse(body as string);
     }
-    if (!query.appId) throw new Error('web端上报数据操作：app_id不能为空');
+    if (!query.appId) throw new Error('web端上报数据操作：appId不能为空');
 
     query.ip = func.getRealIp(req.headers as any, req.ip);
     if (this.config.isLocalDev) query.ip = getRandomIp();
 
     query.url = query.url || headers['referer'];
-    query.user_agent = headers['user-agent'];
+    query.userAgent = headers['user-agent'];
 
     const system = await this.system.getSystemForAppId(query.appId);
-    if (!system?.app_id) throw new Error(`appId:${query.appId} 不存在`);
+    if (!system?.appId) throw new Error(`appId:${query.appId} 不存在`);
 
     await this.saveWebReportDataForRedis(query);
     return func.result({ data: 'ok' });

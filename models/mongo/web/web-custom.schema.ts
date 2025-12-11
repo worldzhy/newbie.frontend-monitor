@@ -3,10 +3,10 @@ import { Document } from 'mongoose';
 
 @Schema({ shardKey: { _id: 'hashed' } })
 export class WebCustom {
-  @Prop() app_id: string; // App ID
-  @Prop({ default: Date.now }) create_time: Date; // Created time
-  @Prop() mark_page: string; // Page mark
-  @Prop() mark_user: string; // User mark
+  @Prop() appId: string; // App ID
+  @Prop({ default: Date.now }) createTime: Date; // Created time
+  @Prop() markPage: string; // Page mark
+  @Prop() markUser: string; // User mark
   @Prop() path: string; // Path
   @Prop() customName: string; // Custom name for grouping
   @Prop() customContent: string; // Custom info (stringified object)
@@ -16,12 +16,12 @@ export class WebCustom {
 }
 export type WebCustomDocument = WebCustom & Document;
 export const WebCustomSchema = SchemaFactory.createForClass(WebCustom);
-WebCustomSchema.index({ create_time: -1 });
+WebCustomSchema.index({ createTime: -1 });
 
 @Schema({ shardKey: { _id: 'hashed' } })
 export class WebCustomFilter {
-  @Prop() app_id: string; // App ID
-  @Prop({ default: Date.now }) create_time: Date; // Created time
+  @Prop() appId: string; // App ID
+  @Prop({ default: Date.now }) createTime: Date; // Created time
   @Prop() filterKey: string; // Filter key
   @Prop() filterDesc: string; // Filter description
 }

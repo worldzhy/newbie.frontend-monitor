@@ -46,8 +46,8 @@ export class WxPageController {
     const { appId, markPage, markUser } = q;
     if (!appId) throw new Error('单个页面详情：appId不能为空');
     if (!markPage) throw new Error('单个页面详情：markPage不能为空');
-    let result = await this.wxPage.getPageDetails(appId, { mark_page: markPage });
-    if (!result) result = await this.wxPage.getPageDetails(appId, { mark_user: markUser });
+    let result = await this.wxPage.getPageDetails(appId, { markPage });
+    if (!result) result = await this.wxPage.getPageDetails(appId, { markUser });
     return func.result({ data: result });
   }
 }

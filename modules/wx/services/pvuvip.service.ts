@@ -18,9 +18,9 @@ export class WxPvuvipService {
     endTime: Date | string
   ) {
     const querydata = {
-      app_id: appId,
+      appId: appId,
       type: 1,
-      create_time: { $gte: new Date(beginTime), $lt: new Date(endTime) },
+      createTime: { $gte: new Date(beginTime), $lt: new Date(endTime) },
     };
     return await this.mongo
       .WxPvuvip()
@@ -35,9 +35,9 @@ export class WxPvuvipService {
     endTime: string | Date
   ) {
     const query = {
-      app_id: appId,
+      appId: appId,
       type: 2,
-      create_time: { $gte: new Date(beginTime), $lte: new Date(endTime) },
+      createTime: { $gte: new Date(beginTime), $lte: new Date(endTime) },
     };
     let num: any = 0;
     if (
@@ -80,22 +80,22 @@ export class WxPvuvipService {
   }
 
   async getHistoryPvUvIplist(appId: string) {
-    const query = { app_id: appId, type: 2 };
+    const query = { appId, type: 2 };
     const data = await this.mongo
       .WxPvuvip()
       .find(query)
       .read("secondaryPreferred")
-      .sort({ create_time: -1 })
+      .sort({ createTime: -1 })
       .limit(5)
       .exec();
     const result = data.map(async (item: any) => {
-      const { create_time, app_id } = item;
+      const { createTime, appId } = item;
       const obj = JSON.parse(JSON.stringify(item));
-      if (create_time) {
+      if (createTime) {
         const num = await this.dayReportNum.getDayFromMongo(
-          app_id,
-          create_time,
-          create_time
+          appId,
+          createTime,
+          createTime
         );
         obj.num = num.num;
       }
@@ -111,7 +111,7 @@ export class WxPvuvipService {
     type?: boolean
   ) {
     const querydata = {
-      create_time: { $gte: new Date(beginTime), $lt: new Date(endTime) },
+      createTime: { $gte: new Date(beginTime), $lt: new Date(endTime) },
     };
     const pv = Promise.resolve(this.pv(appId, querydata));
     const uv = Promise.resolve(this.uv(appId, querydata));
@@ -160,7 +160,7 @@ export class WxPvuvipService {
     const model = await this.ch.WxAjax(appId);
     const rows = await model.find({
       select: "count() as count",
-      where: `create_time>=toDateTime('${beginStr}') and create_time<=toDateTime('${endStr}')`,
+      where: `createTime>=toDateTime('${beginStr}') and createTime<=toDateTime('${endStr}')`,
     });
     return rows?.[0]?.count || 0;
   }
@@ -172,7 +172,7 @@ export class WxPvuvipService {
         { $match: querydata },
         {
           $group: {
-            _id: { mark_uv: "$mark_uv", uid: "$uid", phone: "$phone" },
+            _id: { markUv: "$markUv", uid: "$uid", phone: "$phone" },
           },
         },
         { $group: { _id: null, count: { $sum: 1 } } },
@@ -199,8 +199,8 @@ export class WxPvuvipService {
       .WxPage(appId)
       .aggregate([
         { $match: querydata },
-        { $project: { mark_user: true } },
-        { $group: { _id: "$mark_user" } },
+        { $project: { markUser: true } },
+        { $group: { _id: "$markUser" } },
         { $group: { _id: null, count: { $sum: 1 } } },
       ])
       .read("secondaryPreferred")
@@ -214,7 +214,7 @@ export class WxPvuvipService {
         { $match },
         {
           $group: {
-            _id: { mark_user: "$mark_user" },
+            _id: { markUser: "$markUser" },
             urls: { $push: 1 },
             count: { $sum: 1 },
           },
@@ -236,8 +236,8 @@ export class WxPvuvipService {
     const endStr = func.format(new Date(endTime), "yyyy/MM/dd hh:mm:ss");
     const model = await this.ch.WxAjax(appId);
     const ajaxflow = await model.find({
-      select: "sum(decoded_body_size) as sum",
-      where: `create_time>=toDateTime('${beginStr}') and create_time<=toDateTime('${endStr}')`,
+      select: "sum(bodySize) as sum",
+      where: `createTime>=toDateTime('${beginStr}') and createTime<=toDateTime('${endStr}')`,
     });
     return ajaxflow?.[0]?.sum || 0;
   }
@@ -250,7 +250,7 @@ export class WxPvuvipService {
   ) {
     const pvuvipModel = this.mongo.WxPvuvip();
     const pvuvip = new pvuvipModel();
-    pvuvip.app_id = appId;
+    pvuvip.appId = appId;
     pvuvip.pv = pvuvipdata.pv || 0;
     pvuvip.uv = pvuvipdata.uv || 0;
     pvuvip.ip = pvuvipdata.ip || 0;
@@ -263,7 +263,7 @@ export class WxPvuvipService {
       pvuvipdata.pv && pvuvipdata.user
         ? Math.floor(pvuvipdata.pv / pvuvipdata.user)
         : 0;
-    pvuvip.create_time = endTime;
+    pvuvip.createTime = endTime;
     pvuvip.type = type;
     return await pvuvip.save();
   }
@@ -271,7 +271,7 @@ export class WxPvuvipService {
   async getTimeList(
     beginTime: any,
     endTime: any,
-    datalist: any[],
+    dataList: any[],
     betweenTime: number
   ) {
     const result: any[] = [];
@@ -283,8 +283,8 @@ export class WxPvuvipService {
       const date = new Date(t);
       const timer = func.format(date, "yyyy/MM/dd hh:mm:ss");
       const items: any = { time: timer, pv: 0, uv: 0, ip: 0, ajax: 0, flow: 0 };
-      datalist.forEach((item: any) => {
-        if (new Date(item.create_time).getTime() === date.getTime()) {
+      dataList.forEach((item: any) => {
+        if (new Date(item.createTime).getTime() === date.getTime()) {
           items.pv = item.pv || 0;
           items.uv = item.uv || 0;
           items.ip = item.ip || 0;

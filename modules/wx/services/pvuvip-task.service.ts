@@ -31,25 +31,25 @@ export class WxPvuvipTaskService {
     const systems = await this.system.getWxSystemList();
     if (!systems || !systems.length) return;
     const jobs = systems.map(async (sys: any) => {
-      const appId = sys.app_id;
-      if (!appId || sys.is_use !== 0) return;
+      const appId = sys.appId;
+      if (!appId || sys.isUse !== 0) return;
       const pv = await this.mongo
         .WxPage(appId)
-        .count({ create_time: { $gte: beginTime, $lte: endTime } })
+        .count({ createTime: { $gte: beginTime, $lte: endTime } })
         .read("secondaryPreferred")
         .exec();
       const uvRows = await this.mongo
         .WxPage(appId)
         .aggregate([
-          { $match: { create_time: { $gte: beginTime, $lte: endTime } } },
-          { $group: { _id: { mark_uv: "$mark_uv" }, count: { $sum: 1 } } },
+          { $match: { createTime: { $gte: beginTime, $lte: endTime } } },
+          { $group: { _id: { markUv: "$markUv" }, count: { $sum: 1 } } },
         ])
         .read("secondaryPreferred")
         .exec();
       const ipRows = await this.mongo
         .WxPage(appId)
         .aggregate([
-          { $match: { create_time: { $gte: beginTime, $lte: endTime } } },
+          { $match: { createTime: { $gte: beginTime, $lte: endTime } } },
           { $group: { _id: { ip: "$ip" }, count: { $sum: 1 } } },
         ])
         .read("secondaryPreferred")
@@ -59,12 +59,12 @@ export class WxPvuvipTaskService {
       const ajaxModel = await this.ch.WxAjax(appId);
       const ajaxRows = await ajaxModel.find({
         select: "count() as count",
-        where: `create_time>=toDateTime('${beginStr}') and create_time<=toDateTime('${endStr}')`,
+        where: `createTime>=toDateTime('${beginStr}') and createTime<=toDateTime('${endStr}')`,
       });
       const ajax = ajaxRows?.[0]?.count || 0;
       const pvuvipModel = this.mongo.WxPvuvip();
       const row = new pvuvipModel();
-      row.app_id = appId;
+      row.appId = appId;
       row.pv = pv || 0;
       row.uv = uvRows?.length
         ? uvRows[0].count
@@ -79,7 +79,7 @@ export class WxPvuvipTaskService {
       row.ajax = ajax || 0;
       row.flow = 0;
       row.type = 1;
-      row.create_time = endTime;
+      row.createTime = endTime;
       await row.save();
     });
     await Promise.all(jobs);

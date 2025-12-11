@@ -9,7 +9,7 @@ export class WxCustomService {
     const rows = await this.mongo
       .WxCustomFilter(appId)
       .find()
-      .sort({ create_time: -1 })
+      .sort({ createTime: -1 })
       .read("secondaryPreferred")
       .exec();
     return { list: rows || [] };
@@ -24,7 +24,7 @@ export class WxCustomService {
     if (exists && exists.filterKey)
       throw new Error("新增过滤条件：filterKey已存在");
     const doc = new model();
-    doc.app_id = appId;
+    doc.appId = appId;
     doc.filterKey = filterKey;
     doc.filterDesc = filterDesc;
     await doc.save();
@@ -62,11 +62,11 @@ export class WxCustomService {
     const ct: any = {};
     if (beginTime) {
       ct.$gte = new Date(beginTime);
-      filter.create_time = ct;
+      filter.createTime = ct;
     }
     if (endTime) {
       ct.$lte = new Date(endTime);
-      filter.create_time = ct;
+      filter.createTime = ct;
     }
     if (
       customFilter &&
@@ -84,13 +84,13 @@ export class WxCustomService {
       .count(filter)
       .read("secondaryPreferred")
       .exec();
-    const datalist = await model
+    const dataList = await model
       .find(filter)
       .skip((Number(pageNo) - 1) * Number(pageSize))
       .limit(Number(pageSize))
-      .sort({ create_time: -1 })
+      .sort({ createTime: -1 })
       .read("secondaryPreferred")
       .exec();
-    return { totalNum, datalist, pageNo: Number(pageNo) };
+    return { totalNum, dataList, pageNo: Number(pageNo) };
   }
 }

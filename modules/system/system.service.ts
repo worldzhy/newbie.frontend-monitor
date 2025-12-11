@@ -12,53 +12,53 @@ export class SystemService {
 
   async saveSystemData(body: any) {
     const type = body.type;
-    if (!body.system_domain && type === "web")
+    if (!body.systemDomain && type === "web")
       return func.errResult({ desc: "新增系统信息操作：系统域名不能为空" });
-    if (!body.app_id && type === "wx")
+    if (!body.appId && type === "wx")
       return func.errResult({ desc: "新增系统信息操作：appId不能为空" });
-    if (!body.system_name)
+    if (!body.systemName)
       return func.errResult({ desc: "新增系统信息操作：系统名称不能为空" });
 
     if (type === "web") {
       const search = await this.mongo
         .System()
-        .findOne({ system_domain: body.system_domain })
+        .findOne({ systemDomain: body.systemDomain })
         .exec();
-      if (search && search.system_domain)
+      if (search && search.systemDomain)
         return func.errResult({ desc: "新增系统信息操作：系统已存在" });
     }
     if (type === "wx") {
       const r = await this.mongo
         .System()
-        .findOne({ app_id: body.app_id })
+        .findOne({ appId: body.appId })
         .exec();
-      if (r && r.app_id)
+      if (r && r.appId)
         return func.errResult({
           desc: "新增系统信息操作：系统已存在,appid重复",
         });
     }
 
-    const appId = body.app_id ? body.app_id : func.randomString();
+    const appId = body.appId ? body.appId : func.randomString();
     const SystemModel = this.mongo.System();
     const system = new SystemModel();
-    system.system_domain = body.system_domain;
-    system.system_name = body.system_name;
+    system.systemDomain = body.systemDomain;
+    system.systemName = body.systemName;
     system.type = body.type;
-    system.app_id = appId;
-    system.user_id = [body.token || ""];
-    system.create_time = new Date();
-    system.is_use = body.is_use;
-    system.slow_page_time = body.slow_page_time || 5;
-    system.slow_js_time = body.slow_js_time || 2;
-    system.slow_css_time = body.slow_css_time || 2;
-    system.slow_img_time = body.slow_img_time || 2;
-    system.slow_ajax_time = body.slow_ajax_time || 2;
-    system.is_statisi_pages = body.is_statisi_pages;
-    system.is_statisi_ajax = body.is_statisi_ajax;
-    system.is_statisi_resource = body.is_statisi_resource;
-    system.is_statisi_system = body.is_statisi_system;
-    system.is_statisi_error = body.is_statisi_error;
-    system.is_warning = body.is_warning;
+    system.appId = appId;
+    system.userId = [body.token || ""];
+    system.createTime = new Date();
+    system.isUse = body.isUse;
+    system.slowPageTime = body.slowPageTime || 5;
+    system.slowJsTime = body.slowJsTime || 2;
+    system.slowCssTime = body.slowCssTime || 2;
+    system.slowImgTime = body.slowImgTime || 2;
+    system.slowAjaxTime = body.slowAjaxTime || 2;
+    system.isStatisiPages = body.isStatisiPages;
+    system.isStatisiAjax = body.isStatisiAjax;
+    system.isStatisiResource = body.isStatisiResource;
+    system.isStatisiSystem = body.isStatisiSystem;
+    system.isStatisiError = body.isStatisiError;
+    system.isWarning = body.isWarning;
 
     const result = await system.save();
     await this.updateSystemNodeCache(appId);
@@ -66,33 +66,33 @@ export class SystemService {
   }
 
   async updateSystemData(body: any) {
-    const appId = body.app_id;
+    const appId = body.appId;
     if (!appId)
-      return func.errResult({ desc: "更新系统信息操作：app_id不能为空" });
+      return func.errResult({ desc: "更新系统信息操作：appId不能为空" });
 
     const update = {
       $set: {
-        is_use: body.is_use || 0,
-        system_name: body.system_name || "",
-        system_domain: body.system_domain || "",
-        slow_page_time: body.slow_page_time || 5,
-        slow_js_time: body.slow_js_time || 2,
+        isUse: body.isUse || 0,
+        systemName: body.systemName || "",
+        systemDomain: body.systemDomain || "",
+        slowPageTime: body.slowPageTime || 5,
+        slowJsTime: body.slowJsTime || 2,
         type: body.type || "web",
-        slow_css_time: body.slow_css_time || 2,
-        slow_img_time: body.slow_img_time || 2,
-        slow_ajax_time: body.slow_ajax_time || 2,
-        is_statisi_pages: body.is_statisi_pages || 0,
-        is_statisi_ajax: body.is_statisi_ajax || 0,
-        is_statisi_resource: body.is_statisi_resource || 0,
-        is_statisi_system: body.is_statisi_system || 0,
-        is_statisi_error: body.is_statisi_error || 0,
-        is_daily_use: body.is_daily_use || 0,
-        is_warning: body.is_warning || 0,
+        slowCssTime: body.slowCssTime || 2,
+        slowImgTime: body.slowImgTime || 2,
+        slowAjaxTime: body.slowAjaxTime || 2,
+        isStatisiPages: body.isStatisiPages || 0,
+        isStatisiAjax: body.isStatisiAjax || 0,
+        isStatisiResource: body.isStatisiResource || 0,
+        isStatisiSystem: body.isStatisiSystem || 0,
+        isStatisiError: body.isStatisiError || 0,
+        isDailyUse: body.isDailyUse || 0,
+        isWarning: body.isWarning || 0,
       },
     };
     const result = await this.mongo
       .System()
-      .updateOne({ app_id: appId }, update, { multi: true })
+      .updateOne({ appId: appId }, update, { multi: true })
       .exec();
     await this.updateSystemNodeCache(appId);
     return func.result({ data: result });
@@ -106,7 +106,7 @@ export class SystemService {
   async getSystemForDb(appId: string) {
     if (!appId) throw new Error("查询某个系统信：appId不能为空");
     return (
-      (await this.mongo.System().findOne({ app_id: appId }).exec()) ||
+      (await this.mongo.System().findOne({ appId: appId }).exec()) ||
       ({} as any)
     );
   }
@@ -114,8 +114,8 @@ export class SystemService {
   async getSysForUserId(query: any) {
     const { isWarning, systemName, type } = query;
     const param: any = {};
-    if (isWarning) param.is_warning = parseInt(isWarning);
-    if (systemName) param.system_name = new RegExp(systemName);
+    if (isWarning) param.isWarning = parseInt(isWarning);
+    if (systemName) param.systemName = new RegExp(systemName);
     if (type) param.type = type;
     return (await this.mongo.System().find(param).exec()) || [];
   }
@@ -129,7 +129,7 @@ export class SystemService {
     return (
       (await this.mongo
         .System()
-        .find({ is_warning: 1 })
+        .find({ isWarning: 1 })
         .read("secondaryPreferred")
         .exec()) || []
     );
@@ -139,7 +139,7 @@ export class SystemService {
     return (
       (await this.mongo
         .System()
-        .find({ is_daily_use: 0 })
+        .find({ isDailyUse: 0 })
         .read("secondaryPreferred")
         .exec()) || []
     );
@@ -160,8 +160,8 @@ export class SystemService {
     return this.mongo
       .System()
       .updateOne(
-        { app_id: appId },
-        { $pull: { user_id: userToken } },
+        { appId: appId },
+        { $pull: { userId: userToken } },
         { multi: true }
       )
       .exec();
@@ -170,15 +170,15 @@ export class SystemService {
     return this.mongo
       .System()
       .updateOne(
-        { app_id: appId },
-        { $push: { user_id: userToken } },
+        { appId: appId },
+        { $push: { userId: userToken } },
         { multi: true }
       )
       .exec();
   }
 
   async deleteSystem(appId: string, type: string) {
-    return this.mongo.System().deleteOne({ app_id: appId, type }).exec();
+    return this.mongo.System().deleteOne({ appId: appId, type }).exec();
   }
 
   async handleDaliyEmail(
@@ -190,15 +190,15 @@ export class SystemService {
   ) {
     const system = await this.getSystemForDb(appId);
     if (!system) throw new Error("appId无效");
-    const listKey: "daliy_list" | "highest_list" =
-      item === 2 ? "highest_list" : "daliy_list";
+    const listKey: "daliyList" | "highestList" =
+      item === 2 ? "highestList" : "daliyList";
     const update =
       type === 1
         ? { $addToSet: { [listKey]: email } }
         : { $pull: { [listKey]: email } };
     return this.mongo
       .System()
-      .updateOne({ app_id: appId }, update, { multi: true })
+      .updateOne({ appId: appId }, update, { multi: true })
       .exec();
   }
 
@@ -221,10 +221,10 @@ export class SystemService {
       handletype === 1
         ? {
             $push: {
-              system_ids: { $each: [{ system_id: appId, desc: str, type }] },
+              systemIds: { $each: [{ systemId: appId, desc: str, type }] },
             },
           }
-        : { $pull: { system_ids: { system_id: appId, type } } };
+        : { $pull: { systemIds: { systemId: appId, type } } };
     return this.mongo
       .Email()
       .updateOne({ email: emailAddr }, handleData, { multi: true })

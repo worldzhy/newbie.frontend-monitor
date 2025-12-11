@@ -16,9 +16,9 @@ export class PvuvipService {
     return await this.mongo
       .WebPvuvip()
       .find({
-        app_id: appId,
+        appId: appId,
         type: 1,
-        create_time: { $gte: beginTime, $lte: endTime },
+        createTime: { $gte: beginTime, $lte: endTime },
       })
       .read("secondaryPreferred")
       .exec();
@@ -27,18 +27,18 @@ export class PvuvipService {
   async getHistoryPvUvIplist(appId: string) {
     const data = await this.mongo
       .WebPvuvip()
-      .find({ app_id: appId, type: 2 })
+      .find({ appId, type: 2 })
       .read("secondaryPreferred")
-      .sort({ create_time: -1 })
+      .sort({ createTime: -1 })
       .limit(5)
       .exec();
     const result = data.map(async (item: any) => {
       const obj = JSON.parse(JSON.stringify(item));
-      if (item.create_time) {
+      if (item.createTime) {
         const num = await this.dayReportNum.getDayFromMongo(
-          item.app_id,
-          item.create_time,
-          item.create_time
+          item.appId,
+          item.createTime,
+          item.createTime
         );
         obj.num = num.num;
       }
@@ -49,9 +49,9 @@ export class PvuvipService {
 
   async getPvUvIpSurveyOne(appId: string, beginTime: Date, endTime: Date) {
     const query = {
-      app_id: appId,
+      appId: appId,
       type: 2,
-      create_time: { $gte: beginTime, $lte: endTime },
+      createTime: { $gte: beginTime, $lte: endTime },
     };
     let num: string | number = 0;
     if (
@@ -135,7 +135,7 @@ export class PvuvipService {
   ) {
     const pvuvipModel = this.mongo.WebPvuvip();
     const pvuvip = new pvuvipModel();
-    pvuvip.app_id = appId;
+    pvuvip.appId = appId;
     pvuvip.pv = pvuvipdata.pv || 0;
     pvuvip.uv = pvuvipdata.uv || 0;
     pvuvip.ip = pvuvipdata.ip || 0;
@@ -148,16 +148,16 @@ export class PvuvipService {
       pvuvipdata.pv && pvuvipdata.user
         ? Math.floor(pvuvipdata.pv / pvuvipdata.user)
         : 0;
-    pvuvip.create_time = endTime;
+    pvuvip.createTime = endTime;
     pvuvip.type = type;
     return await pvuvip.save();
   }
 
   getMatch(beginTime?: Date | string, endTime?: Date | string) {
     const $match: any = {};
-    const create_time: any = {};
-    if (beginTime) { create_time.$gte = new Date(beginTime as any); $match.create_time = create_time; }
-    if (endTime) { create_time.$lte = new Date(endTime as any); $match.create_time = create_time; }
+    const createTime: any = {};
+    if (beginTime) { createTime.$gte = new Date(beginTime as any); $match.createTime = createTime; }
+    if (endTime) { createTime.$lte = new Date(endTime as any); $match.createTime = createTime; }
     return $match;
   }
 
@@ -169,14 +169,14 @@ export class PvuvipService {
     const beginStr = func.format(new Date(times.beginTime), "yyyy/MM/dd hh:mm:ss");
     const endStr = func.format(new Date(times.endTime), "yyyy/MM/dd hh:mm:ss");
     const model = await this.ch.WebAjax(appId);
-    const rows = await model.find({ select: "count() as count", where: `create_time>=toDateTime('${beginStr}') and create_time<=toDateTime('${endStr}')` });
+    const rows = await model.find({ select: "count() as count", where: `createTime>=toDateTime('${beginStr}') and createTime<=toDateTime('${endStr}')` });
     return rows?.[0]?.count || 0;
   }
 
   async uv(appId: string, querydata: any) {
     return this.mongo.WebEnvironment(appId).aggregate([
       { $match: querydata },
-      { $group: { _id: { mark_uv: "$mark_uv", uid: "$uid", phone: "$phone" } } },
+      { $group: { _id: { markUv: "$markUv", uid: "$uid", phone: "$phone" } } },
       { $group: { _id: null, count: { $sum: 1 } } }
     ]).read("secondaryPreferred").exec();
   }
@@ -193,8 +193,8 @@ export class PvuvipService {
   async user(appId: string, querydata: any) {
     return this.mongo.WebEnvironment(appId).aggregate([
       { $match: querydata },
-      { $project: { mark_user: true } },
-      { $group: { _id: "$mark_user" } },
+      { $project: { markUser: true } },
+      { $group: { _id: "$markUser" } },
       { $group: { _id: null, count: { $sum: 1 } } }
     ]).read("secondaryPreferred").exec();
   }
@@ -202,7 +202,7 @@ export class PvuvipService {
   async bounce(appId: string, $match: any) {
     const result = await this.mongo.WebEnvironment(appId).aggregate([
       { $match },
-      { $group: { _id: { mark_user: "$mark_user" }, urls: { $push: 1 }, count: { $sum: 1 } } },
+      { $group: { _id: { markUser: "$markUser" }, urls: { $push: 1 }, count: { $sum: 1 } } },
       { $match: { count: 1 } },
       { $count: "bounce" }
     ]).read("secondaryPreferred").exec();
@@ -213,7 +213,7 @@ export class PvuvipService {
     const beginStr = func.format(new Date(times.beginTime), "yyyy/MM/dd hh:mm:ss");
     const endStr = func.format(new Date(times.endTime), "yyyy/MM/dd hh:mm:ss");
     const model = await this.ch.WebAjax(appId);
-    const rows = await model.find({ select: "sum(decoded_body_size) as sum", where: `create_time>=toDateTime('${beginStr}') and create_time<=toDateTime('${endStr}')` });
+    const rows = await model.find({ select: "sum(bodySize) as sum", where: `createTime>=toDateTime('${beginStr}') and createTime<=toDateTime('${endStr}')` });
     return rows?.[0]?.sum || 0;
   }
 }

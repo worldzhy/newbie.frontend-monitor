@@ -5,7 +5,7 @@ export default function WebError(chOrm: any) {
   const schema = {
     tableName: ClickHouseTablePrefix.WEB_ERROR,
     schema: {
-      create_time: { type: DATA_TYPE.DateTime, default: Date.now }, // Created time
+      createTime: { type: DATA_TYPE.DateTime, default: Date.now }, // Created time
       msg: { type: DATA_TYPE.String }, // Error message
       name: { type: DATA_TYPE.String }, // JS error type
       stack: { type: DATA_TYPE.String }, // Stack trace
@@ -18,18 +18,18 @@ export default function WebError(chOrm: any) {
       query: { type: DATA_TYPE.String }, // HTTP query params
       options: { type: DATA_TYPE.String }, // POST body params
       method: { type: DATA_TYPE.LowCardinality(DATA_TYPE.String) }, // Request method
-      full_url: { type: DATA_TYPE.String }, // Full error resource URL
-      resource_url: { type: DATA_TYPE.String }, // Error resource URL
+      fullUrl: { type: DATA_TYPE.String }, // Full error resource URL
+      resourceUrl: { type: DATA_TYPE.String }, // Error resource URL
       url: { type: DATA_TYPE.String }, // Page URL
-      mark_page: { type: DATA_TYPE.String }, // Page mark
-      mark_user: { type: DATA_TYPE.String }, // User mark
+      markPage: { type: DATA_TYPE.String }, // Page mark
+      markUser: { type: DATA_TYPE.String }, // User mark
       phone: { type: DATA_TYPE.String }, // User phone
       uid: { type: DATA_TYPE.String }, // User ID
-      trace_id: { type: DATA_TYPE.String }, // Trace ID
+      traceId: { type: DATA_TYPE.String }, // Trace ID
     },
     options: `ENGINE = MergeTree
-    PARTITION BY toYYYYMM(create_time)
-    ORDER BY create_time`,
+    PARTITION BY toYYYYMM(createTime)
+    ORDER BY createTime`,
     autoCreate: true,
     autoSync: true,
   };

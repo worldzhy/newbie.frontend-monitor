@@ -11,9 +11,9 @@ export class AjaxService {
 
   async getPageAjaxsAvg(appId: string, url?: string, beginTime?: string, endTime?: string) {
     const wheres: string[] = [];
-    if (url) wheres.push(`call_url='${url}'`);
-    if (beginTime) wheres.push(`create_time>=toDateTime('${beginTime}')`);
-    if (endTime) wheres.push(`create_time<=toDateTime('${endTime}')`);
+    if (url) wheres.push(`callUrl='${url}'`);
+    if (beginTime) wheres.push(`createTime>=toDateTime('${beginTime}')`);
+    if (endTime) wheres.push(`createTime<=toDateTime('${endTime}')`);
     const where = wheres.length ? wheres.join(' and ') : undefined;
     const model = await this.ch.WebAjax(appId);
     const countQuery = model.find([
@@ -22,7 +22,7 @@ export class AjaxService {
     ]);
     const listQuery = model.find({
       where,
-      select: 'url,method,count() as count,floor(avg(duration)) as durationAvg,floor(avg(decoded_body_size)) as body_size',
+      select: 'url,method,count() as count,floor(avg(duration)) as durationAvg,floor(avg(bodySize)) as bodySize',
       groupBy: 'url,method',
       orderBy: 'durationAvg DESC'
     });
@@ -31,7 +31,7 @@ export class AjaxService {
       item._id = { method: item.method, url: item.url };
       item.duration = item.durationAvg;
     });
-    return { datalist: list, totalNum: count?.[0]?.total || 0, pageNo: 1 };
+    return { dataList: list, totalNum: count?.[0]?.total || 0, pageNo: 1 };
   }
 
   async getAverageAjaxList(query: any) {
@@ -40,14 +40,14 @@ export class AjaxService {
     const wheres: string[] = [];
     if (parseInt(type) === 2) wheres.push('duration>2000');
     if (url) wheres.push(`ilike(url,'%${url}%')`);
-    if (beginTime) wheres.push(`create_time>=toDateTime('${beginTime}')`);
-    if (endTime) wheres.push(`create_time<=toDateTime('${endTime}')`);
+    if (beginTime) wheres.push(`createTime>=toDateTime('${beginTime}')`);
+    if (endTime) wheres.push(`createTime<=toDateTime('${endTime}')`);
     const where = wheres.length ? wheres.join(' and ') : undefined;
     const model = await this.ch.WebAjax(appId);
     const countQuery = model.find([{ where, select: 'url', groupBy: 'url,method' }, { select: 'count() as total' }]);
     const listQuery = model.find({
       where,
-      select: 'url,method,count() as count,floor(avg(duration)) as durationAvg,floor(avg(decoded_body_size)) as body_size',
+      select: 'url,method,count() as count,floor(avg(duration)) as durationAvg,floor(avg(bodySize)) as bodySize',
       groupBy: 'url,method',
       limit: pageSize,
       skip: (pageNo - 1) * pageSize,
@@ -58,7 +58,7 @@ export class AjaxService {
       item._id = { method: item.method, url: item.url };
       item.duration = item.durationAvg;
     });
-    return { datalist: list, totalNum: count?.[0]?.total || 0, pageNo };
+    return { dataList: list, totalNum: count?.[0]?.total || 0, pageNo };
   }
 
   async getOneAjaxList(appId: string, url?: string, pageNo = 1, pageSize = 15, beginTime?: string, endTime?: string, type?: number) {
@@ -66,24 +66,24 @@ export class AjaxService {
     const wheres: string[] = [];
     if (parseInt(String(type)) === 2) wheres.push('duration>2000');
     if (url) wheres.push(`ilike(url,'%${url}%')`);
-    if (beginTime) wheres.push(`create_time>=toDateTime('${beginTime}')`);
-    if (endTime) wheres.push(`create_time<=toDateTime('${endTime}')`);
+    if (beginTime) wheres.push(`createTime>=toDateTime('${beginTime}')`);
+    if (endTime) wheres.push(`createTime<=toDateTime('${endTime}')`);
     const where = wheres.length ? wheres.join(' and ') : undefined;
     const model = await this.ch.WebAjax(appId);
     const countQuery = model.find([{ where, select: 'url' }, { select: 'count() as total' }]);
-    const listQuery = model.find({ where, select: '*', limit: pageSize, skip: (pageNo - 1) * pageSize, orderBy: 'create_time DESC' });
+    const listQuery = model.find({ where, select: '*', limit: pageSize, skip: (pageNo - 1) * pageSize, orderBy: 'createTime DESC' });
     const [count, list] = await Promise.all([countQuery, listQuery]);
-    return { datalist: list, totalNum: count?.[0]?.total || 0, pageNo };
+    return { dataList: list, totalNum: count?.[0]?.total || 0, pageNo };
   }
 
   async getMarkUserAjaxList(appId: string, opts: { markUser?: string; beginTime?: string; endTime?: string }) {
     const wheres: string[] = [];
-    if (opts.markUser) wheres.push(`mark_user='${opts.markUser}'`);
-    if (opts.beginTime) wheres.push(`create_time>=toDateTime('${opts.beginTime}')`);
-    if (opts.endTime) wheres.push(`create_time<=toDateTime('${opts.endTime}')`);
+    if (opts.markUser) wheres.push(`markUser='${opts.markUser}'`);
+    if (opts.beginTime) wheres.push(`createTime>=toDateTime('${opts.beginTime}')`);
+    if (opts.endTime) wheres.push(`createTime<=toDateTime('${opts.endTime}')`);
     const where = wheres.length ? wheres.join(' and ') : undefined;
     const model = await this.ch.WebAjax(appId);
-    const list = await model.find({ where, select: '*', orderBy: 'create_time ASC' });
+    const list = await model.find({ where, select: '*', orderBy: 'createTime ASC' });
     return { list };
   }
 }

@@ -73,7 +73,7 @@ export class WxPageService {
     );
     const all = await Promise.all(resolvelist);
     all.forEach((item) => result.push(item?.[0]));
-    return { datalist: result, totalNum: copdistinct.length, pageNo };
+    return { dataList: result, totalNum: copdistinct.length, pageNo };
   }
 
   private async oneThread(
@@ -99,7 +99,7 @@ export class WxPageService {
       ])
       .read("secondaryPreferred")
       .exec();
-    return { datalist: datas, totalNum: count.length, pageNo };
+    return { dataList: datas, totalNum: count.length, pageNo };
   }
 
   async getOnePageList(query: any) {
@@ -115,13 +115,13 @@ export class WxPageService {
       .WxPage(appId)
       .aggregate([
         { $match: match },
-        { $sort: { create_time: -1 } },
+        { $sort: { createTime: -1 } },
         { $skip: (Number(pageNo) - 1) * Number(pageSize) },
         { $limit: Number(pageSize) },
       ])
       .read("secondaryPreferred")
       .exec();
-    return { datalist: datas, totalNum: count, pageNo: Number(pageNo) };
+    return { dataList: datas, totalNum: count, pageNo: Number(pageNo) };
   }
 
   async getPageDetails(appId: string, query: any) {
@@ -141,7 +141,7 @@ export class WxPageService {
   ) {
     const match: any = { path: url };
     if (beginTime && endTime)
-      match.create_time = {
+      match.createTime = {
         $gte: new Date(beginTime),
         $lte: new Date(endTime),
       };

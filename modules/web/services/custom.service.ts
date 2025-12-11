@@ -9,7 +9,7 @@ export class WebCustomService {
     const rows = await this.mongo
       .WebCustomFilter(appId)
       .find()
-      .sort({ create_time: -1 })
+      .sort({ createTime: -1 })
       .read('secondaryPreferred')
       .exec();
     return { list: rows || [] };
@@ -23,7 +23,7 @@ export class WebCustomService {
     const exists = await model.findOne({ filterKey }).exec();
     if (exists && exists.filterKey) throw new Error('新增过滤条件：filterKey已存在');
     const doc = new model();
-    doc.app_id = appId;
+    doc.appId = appId;
     doc.filterKey = filterKey;
     doc.filterDesc = filterDesc;
     await doc.save();
@@ -58,9 +58,9 @@ export class WebCustomService {
   ) {
     const filter: any = {};
     if (customName) filter.customName = { $regex: customName, $options: 'i' };
-    const create_time: any = {};
-    if (beginTime) { create_time.$gte = new Date(beginTime); filter.create_time = create_time; }
-    if (endTime) { create_time.$lte = new Date(endTime); filter.create_time = create_time; }
+    const createTime: any = {};
+    if (beginTime) { createTime.$gte = new Date(beginTime); filter.createTime = createTime; }
+    if (endTime) { createTime.$lte = new Date(endTime); filter.createTime = createTime; }
     if (customFilter && Object.prototype.toString.apply(customFilter) === '[object Object]') {
       Object.keys(customFilter).forEach(key => {
         if (customFilter[key] !== null && customFilter[key] !== '' && typeof customFilter[key] !== 'undefined') {
@@ -70,13 +70,13 @@ export class WebCustomService {
     }
     const model = this.mongo.WebCustom(appId);
     const totalNum = await model.count(filter).read('secondaryPreferred').exec();
-    const datalist = await model
+    const dataList = await model
       .find(filter)
       .skip((Number(pageNo) - 1) * Number(pageSize))
       .limit(Number(pageSize))
-      .sort({ create_time: -1 })
+      .sort({ createTime: -1 })
       .read('secondaryPreferred')
       .exec();
-    return { totalNum, datalist, pageNo: Number(pageNo) };
+    return { totalNum, dataList, pageNo: Number(pageNo) };
   }
 }
