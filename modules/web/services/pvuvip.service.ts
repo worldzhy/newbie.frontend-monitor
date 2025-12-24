@@ -47,6 +47,24 @@ export class PvuvipService {
     return await Promise.all(result);
   }
 
+  async getHistoryPvUvIplistByRange(appId: string, beginTime: Date, endTime: Date) {
+    const start = new Date(func.format(beginTime, "yyyy/MM/dd 00:00:00"));
+    const end = new Date(func.format(endTime, "yyyy/MM/dd 23:59:59"));
+    const days: any[] = [];
+    for (let d = new Date(start); d.valueOf() <= end.valueOf(); d.setDate(d.getDate() + 1)) {
+      const dayStart = new Date(func.format(d, "yyyy/MM/dd 00:00:00"));
+      const dayEnd = new Date(func.format(d, "yyyy/MM/dd 23:59:59"));
+      const survey = await this.getPvUvIpSurvey(appId, dayStart, dayEnd, true);
+      const numRes = await this.dayReportNum.getDayFromMongo(appId, dayStart, dayEnd);
+      days.push({
+        time: func.format(dayStart, "yyyy/MM/dd"),
+        ...survey,
+        num: numRes?.num || 0,
+      });
+    }
+    return days;
+  }
+
   async getPvUvIpSurveyOne(appId: string, beginTime: Date, endTime: Date) {
     const query = {
       appId: appId,
