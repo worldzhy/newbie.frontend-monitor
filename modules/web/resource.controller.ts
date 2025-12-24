@@ -1,6 +1,6 @@
-import { Controller, Get, Query } from '@nestjs/common';
-import { func } from '../../shared/utils';
-import { ResourceService } from './services/resource.service';
+import {Controller, Get, Query} from '@nestjs/common';
+import {func} from '../../shared/utils';
+import {ResourceService} from './services/resource.service';
 
 @Controller('/api/v1/resource')
 export class ResourceController {
@@ -8,45 +8,60 @@ export class ResourceController {
 
   @Get('/getResourceForType')
   async getResourceForType(@Query() q: any) {
-    const { appId, url, type = 1, pageNo = 1, pageSize = 15, beginTime, endTime } = q;
+    const {appId, url, type = 1, pageNo = 1, pageSize = 15, beginTime, endTime} = q;
     if (!appId) throw new Error('单个页面资源性能列表：appId不能为空');
     if (!url) throw new Error('单个页面资源性能列表：url不能为空');
-    const result = await this.resourceSrv.getResourceForType(appId, url, Number(type), Number(pageNo), Number(pageSize), beginTime, endTime);
-    return func.result({ data: result });
+    const result = await this.resourceSrv.getResourceForType(
+      appId,
+      url,
+      Number(type),
+      Number(pageNo),
+      Number(pageSize),
+      beginTime,
+      endTime
+    );
+    return func.result({data: result});
   }
 
   @Get('/getAverageResourceList')
   async getAverageResourceList(@Query() q: any) {
-    const { appId } = q;
+    const {appId} = q;
     if (!appId) throw new Error('获得resource平均性能列表：appId不能为空');
     const result = await this.resourceSrv.getAverageResourceList(q);
-    return func.result({ data: result });
+    return func.result({data: result});
   }
 
   @Get('/getOneResourceAvg')
   async getOneResourceAvg(@Query() q: any) {
-    const { appId, url, beginTime, endTime } = q;
+    const {appId, url, beginTime, endTime} = q;
     if (!appId) throw new Error('单个Resource平均性能数据：appId不能为空');
     if (!url) throw new Error('单个Resource平均性能数据：api地址不能为空');
     const result = await this.resourceSrv.getOneResourceAvg(appId, url, beginTime, endTime);
-    return func.result({ data: result });
+    return func.result({data: result});
   }
 
   @Get('/getOneResourceList')
   async getOneResourceList(@Query() q: any) {
-    const { appId, url, pageNo = 1, pageSize = 15, beginTime, endTime } = q;
+    const {appId, url, pageNo = 1, pageSize = 15, beginTime, endTime} = q;
     if (!appId) throw new Error('单个Resource性能列表数据：appId不能为空');
     if (!url) throw new Error('单个Resource性能列表数据：api地址不能为空');
-    const result = await this.resourceSrv.getOneResourceList(appId, url, Number(pageNo), Number(pageSize), beginTime, endTime);
-    return func.result({ data: result });
+    const result = await this.resourceSrv.getOneResourceList(
+      appId,
+      url,
+      Number(pageNo),
+      Number(pageSize),
+      beginTime,
+      endTime
+    );
+    return func.result({data: result});
   }
 
   @Get('/getOneResourceDetail')
   async getOneResourceDetail(@Query() q: any) {
-    const { appId, id } = q;
+    const {appId, id} = q;
     if (!id) throw new Error('获得单个Resource详情信息：id不能为空');
     if (!appId) throw new Error('获得单个Resource详情信息：appId不能为空');
     const row = await this.resourceSrv.getOneResourceDetail(appId, id);
-    return func.result({ data: row || {} });
+    return func.result({data: row || {}});
   }
 }

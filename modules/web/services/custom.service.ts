@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { MongoModelsService } from '../../../models/mongo/mongo.service';
+import {Injectable} from '@nestjs/common';
+import {MongoModelsService} from '../../../models/mongo/mongo.service';
 
 @Injectable()
 export class WebCustomService {
@@ -9,10 +9,10 @@ export class WebCustomService {
     const rows = await this.mongo
       .WebCustomFilter(appId)
       .find()
-      .sort({ createTime: -1 })
+      .sort({createTime: -1})
       .read('secondaryPreferred')
       .exec();
-    return { list: rows || [] };
+    return {list: rows || []};
   }
 
   async addCustomFilter(appId: string, filterKey: string, filterDesc: string) {
@@ -20,7 +20,7 @@ export class WebCustomService {
     if (!appId) throw new Error('新增过滤条件：appId不能为空');
     if (!filterDesc) throw new Error('新增过滤条件：filterDesc不能为空');
     const model = this.mongo.WebCustomFilter(appId);
-    const exists = await model.findOne({ filterKey }).exec();
+    const exists = await model.findOne({filterKey}).exec();
     if (exists && exists.filterKey) throw new Error('新增过滤条件：filterKey已存在');
     const doc = new model();
     doc.appId = appId;
@@ -35,12 +35,12 @@ export class WebCustomService {
     if (!appId) throw new Error('删除过滤条件：appId不能为空');
     const model = this.mongo.WebCustomFilter(appId);
     try {
-      await model.findOne({ _id: id }).exec();
+      await model.findOne({_id: id}).exec();
     } catch {
       throw new Error('删除过滤条件：_id不存在');
     }
     try {
-      await model.deleteOne({ _id: id }).exec();
+      await model.deleteOne({_id: id}).exec();
       return true;
     } catch {
       throw new Error('删除过滤条件：删除失败');
@@ -57,14 +57,20 @@ export class WebCustomService {
     customFilter?: Record<string, any>
   ) {
     const filter: any = {};
-    if (customName) filter.customName = { $regex: customName, $options: 'i' };
+    if (customName) filter.customName = {$regex: customName, $options: 'i'};
     const createTime: any = {};
-    if (beginTime) { createTime.$gte = new Date(beginTime); filter.createTime = createTime; }
-    if (endTime) { createTime.$lte = new Date(endTime); filter.createTime = createTime; }
+    if (beginTime) {
+      createTime.$gte = new Date(beginTime);
+      filter.createTime = createTime;
+    }
+    if (endTime) {
+      createTime.$lte = new Date(endTime);
+      filter.createTime = createTime;
+    }
     if (customFilter && Object.prototype.toString.apply(customFilter) === '[object Object]') {
       Object.keys(customFilter).forEach(key => {
         if (customFilter[key] !== null && customFilter[key] !== '' && typeof customFilter[key] !== 'undefined') {
-          filter[`customFilter.${key}`] = { $regex: customFilter[key], $options: 'i' };
+          filter[`customFilter.${key}`] = {$regex: customFilter[key], $options: 'i'};
         }
       });
     }
@@ -74,9 +80,9 @@ export class WebCustomService {
       .find(filter)
       .skip((Number(pageNo) - 1) * Number(pageSize))
       .limit(Number(pageSize))
-      .sort({ createTime: -1 })
+      .sort({createTime: -1})
       .read('secondaryPreferred')
       .exec();
-    return { totalNum, dataList, pageNo: Number(pageNo) };
+    return {totalNum, dataList, pageNo: Number(pageNo)};
   }
 }

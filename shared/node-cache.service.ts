@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { SystemDocument } from '../models/mongo/system.schema';
+import {Injectable} from '@nestjs/common';
+import {SystemDocument} from '../models/mongo/system.schema';
 
 @Injectable()
 export class NodeCacheService {

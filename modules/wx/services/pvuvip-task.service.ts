@@ -1,12 +1,12 @@
-import { Injectable } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import { SystemService } from "../../../modules/system/system.service";
-import { MongoModelsService } from "../../../models/mongo/mongo.service";
-import { ClickhouseService } from "../../../models/clickhouse/clickhouse.service";
-import { func } from "../../../shared/utils";
+import {Injectable} from '@nestjs/common';
+import {ConfigService} from '@nestjs/config';
+import {SystemService} from '../../../modules/system/system.service';
+import {MongoModelsService} from '../../../models/mongo/mongo.service';
+import {ClickhouseService} from '../../../models/clickhouse/clickhouse.service';
+import {func} from '../../../shared/utils';
 
 function cronMinuteInterval(cronExp: string) {
-  const m = cronExp.split(" ")[1] || "*/2";
+  const m = cronExp.split(' ')[1] || '*/2';
   const match = m.match(/\*\/(\d+)/);
   const step = match ? Number(match[1]) : 2;
   return step * 60000;
@@ -35,30 +35,30 @@ export class WxPvuvipTaskService {
       if (!appId || sys.isUse !== 0) return;
       const pv = await this.mongo
         .WxPage(appId)
-        .count({ createTime: { $gte: beginTime, $lte: endTime } })
-        .read("secondaryPreferred")
+        .count({createTime: {$gte: beginTime, $lte: endTime}})
+        .read('secondaryPreferred')
         .exec();
       const uvRows = await this.mongo
         .WxPage(appId)
         .aggregate([
-          { $match: { createTime: { $gte: beginTime, $lte: endTime } } },
-          { $group: { _id: { markUv: "$markUv" }, count: { $sum: 1 } } },
+          {$match: {createTime: {$gte: beginTime, $lte: endTime}}},
+          {$group: {_id: {markUv: '$markUv'}, count: {$sum: 1}}},
         ])
-        .read("secondaryPreferred")
+        .read('secondaryPreferred')
         .exec();
       const ipRows = await this.mongo
         .WxPage(appId)
         .aggregate([
-          { $match: { createTime: { $gte: beginTime, $lte: endTime } } },
-          { $group: { _id: { ip: "$ip" }, count: { $sum: 1 } } },
+          {$match: {createTime: {$gte: beginTime, $lte: endTime}}},
+          {$group: {_id: {ip: '$ip'}, count: {$sum: 1}}},
         ])
-        .read("secondaryPreferred")
+        .read('secondaryPreferred')
         .exec();
-      const beginStr = func.format(beginTime, "yyyy/MM/dd hh:mm:ss");
-      const endStr = func.format(endTime, "yyyy/MM/dd hh:mm:ss");
+      const beginStr = func.format(beginTime, 'yyyy/MM/dd hh:mm:ss');
+      const endStr = func.format(endTime, 'yyyy/MM/dd hh:mm:ss');
       const ajaxModel = await this.ch.WxAjax(appId);
       const ajaxRows = await ajaxModel.find({
-        select: "count() as count",
+        select: 'count() as count',
         where: `createTime>=toDateTime('${beginStr}') and createTime<=toDateTime('${endStr}')`,
       });
       const ajax = ajaxRows?.[0]?.count || 0;
@@ -66,16 +66,8 @@ export class WxPvuvipTaskService {
       const row = new pvuvipModel();
       row.appId = appId;
       row.pv = pv || 0;
-      row.uv = uvRows?.length
-        ? uvRows[0].count
-          ? uvRows.length
-          : uvRows.length
-        : 0;
-      row.ip = ipRows?.length
-        ? ipRows[0].count
-          ? ipRows.length
-          : ipRows.length
-        : 0;
+      row.uv = uvRows?.length ? (uvRows[0].count ? uvRows.length : uvRows.length) : 0;
+      row.ip = ipRows?.length ? (ipRows[0].count ? ipRows.length : ipRows.length) : 0;
       row.ajax = ajax || 0;
       row.flow = 0;
       row.type = 1;

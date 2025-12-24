@@ -1,6 +1,6 @@
-import { Injectable } from "@nestjs/common";
-import { MongoModelsService } from "../../../models/mongo/mongo.service";
-import { ConfigService } from "@nestjs/config";
+import {Injectable} from '@nestjs/common';
+import {MongoModelsService} from '../../../models/mongo/mongo.service';
+import {ConfigService} from '@nestjs/config';
 
 @Injectable()
 export class WxAnalysisService {
@@ -12,13 +12,8 @@ export class WxAnalysisService {
     this.cfg = this.config.get('microservices.frontend-monitor');
   }
 
-  async getAnalysislist(
-    appId: string,
-    beginTime?: string,
-    endTime?: string,
-    filter?: { phone?: string; uid?: string }
-  ) {
-    const query: any = { $match: {} };
+  async getAnalysislist(appId: string, beginTime?: string, endTime?: string, filter?: {phone?: string; uid?: string}) {
+    const query: any = {$match: {}};
     if (filter?.phone) query.$match.phone = filter.phone;
     if (filter?.uid) query.$match.uid = filter.uid;
     const createTime: any = {};
@@ -40,145 +35,100 @@ export class WxAnalysisService {
         query,
         {
           $group: {
-            _id: { markUser: "$markUser" },
-            visitTime: { $first: "$createTime" },
+            _id: {markUser: '$markUser'},
+            visitTime: {$first: '$createTime'},
           },
         },
-        { $sort: { visitTime: 1 } },
+        {$sort: {visitTime: 1}},
       ])
-      .read("secondaryPreferred")
+      .read('secondaryPreferred')
       .exec();
-    return { list: result };
+    return {list: result};
   }
 
   async getAnalysisOneList(appId: string, markUser: string) {
-    return await this.mongo
-      .WxPage(appId)
-      .find({ markUser })
-      .read("secondaryPreferred")
-      .sort({ createTime: 1 })
-      .exec();
+    return await this.mongo.WxPage(appId).find({markUser}).read('secondaryPreferred').sort({createTime: 1}).exec();
   }
 
   async getTopDatas(appId: string, beginTime?: string, endTime?: string) {
-    const top_pages = await this.getRealTimeTopPagesForDb(
-      appId,
-      beginTime,
-      endTime
-    );
-    const top_jump_out = await this.getRealTimeTopJumpOutForDb(
-      appId,
-      beginTime,
-      endTime
-    );
-    const top_brand = await this.getRealTimeTopBrandForDb(
-      appId,
-      beginTime,
-      endTime
-    );
-    const provinces = await this.getRealTimeTopProvinceForDb(
-      appId,
-      beginTime,
-      endTime
-    );
-    return { top_pages, top_jump_out, top_brand, provinces };
+    const top_pages = await this.getRealTimeTopPagesForDb(appId, beginTime, endTime);
+    const top_jump_out = await this.getRealTimeTopJumpOutForDb(appId, beginTime, endTime);
+    const top_brand = await this.getRealTimeTopBrandForDb(appId, beginTime, endTime);
+    const provinces = await this.getRealTimeTopProvinceForDb(appId, beginTime, endTime);
+    return {top_pages, top_jump_out, top_brand, provinces};
   }
 
-  private async getRealTimeTopPagesForDb(
-    appId: string,
-    beginTime?: string,
-    endTime?: string
-  ) {
+  private async getRealTimeTopPagesForDb(appId: string, beginTime?: string, endTime?: string) {
     const $match = this.getMatch(beginTime, endTime);
     const result = await this.mongo
       .WxPage(appId)
       .aggregate([
-        { $match },
-        { $group: { _id: { url: "$path" }, count: { $sum: 1 } } },
-        { $sort: { count: -1 } },
-        { $limit: this.cfg.top_alalysis_size?.wx || 10 },
+        {$match},
+        {$group: {_id: {url: '$path'}, count: {$sum: 1}}},
+        {$sort: {count: -1}},
+        {$limit: this.cfg.top_alalysis_size?.wx || 10},
       ])
-      .read("secondaryPreferred")
+      .read('secondaryPreferred')
       .exec();
     return result;
   }
 
-  private async getRealTimeTopJumpOutForDb(
-    appId: string,
-    beginTime?: string,
-    endTime?: string
-  ) {
+  private async getRealTimeTopJumpOutForDb(appId: string, beginTime?: string, endTime?: string) {
     const $match = this.getMatch(beginTime, endTime);
     const result = await this.mongo
       .WxPage(appId)
       .aggregate([
-        { $match: $match },
+        {$match: $match},
         {
           $group: {
-            _id: { markUser: "$markUser" },
-            paths: { $push: "$path" },
-            count: { $sum: 1 },
+            _id: {markUser: '$markUser'},
+            paths: {$push: '$path'},
+            count: {$sum: 1},
           },
         },
-        { $match: { count: 1 } },
+        {$match: {count: 1}},
         {
           $group: {
-            _id: { value: { $arrayElemAt: ["$paths", 0] } },
-            count: { $sum: 1 },
+            _id: {value: {$arrayElemAt: ['$paths', 0]}},
+            count: {$sum: 1},
           },
         },
-        { $sort: { count: -1 } },
-        { $limit: this.cfg.top_alalysis_size?.wx || 10 },
+        {$sort: {count: -1}},
+        {$limit: this.cfg.top_alalysis_size?.wx || 10},
       ])
-      .read("secondaryPreferred")
+      .read('secondaryPreferred')
       .exec();
     return result;
   }
 
-  private async getRealTimeTopBrandForDb(
-    appId: string,
-    beginTime?: string,
-    endTime?: string
-  ) {
+  private async getRealTimeTopBrandForDb(appId: string, beginTime?: string, endTime?: string) {
     const $match = this.getMatch(beginTime, endTime);
     const result = await this.mongo
       .WxPage(appId)
       .aggregate([
-        { $match },
-        { $group: { _id: { brand: "$brand" }, count: { $sum: 1 } } },
-        { $sort: { count: -1 } },
-        { $limit: this.cfg.top_alalysis_size?.wx || 10 },
+        {$match},
+        {$group: {_id: {brand: '$brand'}, count: {$sum: 1}}},
+        {$sort: {count: -1}},
+        {$limit: this.cfg.top_alalysis_size?.wx || 10},
       ])
-      .read("secondaryPreferred")
+      .read('secondaryPreferred')
       .exec();
     return result;
   }
 
-  private async getRealTimeTopProvinceForDb(
-    appId: string,
-    beginTime?: string,
-    endTime?: string
-  ) {
+  private async getRealTimeTopProvinceForDb(appId: string, beginTime?: string, endTime?: string) {
     const $match = this.getMatch(beginTime, endTime);
     const result = await this.mongo
       .WxPage(appId)
-      .aggregate([
-        { $match },
-        { $group: { _id: { province: "$province" }, count: { $sum: 1 } } },
-        { $sort: { count: -1 } },
-      ])
-      .read("secondaryPreferred")
+      .aggregate([{$match}, {$group: {_id: {province: '$province'}, count: {$sum: 1}}}, {$sort: {count: -1}}])
+      .read('secondaryPreferred')
       .exec();
     return result;
   }
 
   async getProvinceCount(appId: string, beginTime?: string, endTime?: string) {
-    const res = await this.getRealTimeTopProvinceForDb(
-      appId,
-      beginTime,
-      endTime
-    );
-    return { provinces: res };
+    const res = await this.getRealTimeTopProvinceForDb(appId, beginTime, endTime);
+    return {provinces: res};
   }
 
   private getMatch(beginTime?: string, endTime?: string) {

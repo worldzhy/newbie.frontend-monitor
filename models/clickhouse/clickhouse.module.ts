@@ -1,11 +1,11 @@
-import { Global, Module } from '@nestjs/common';
-import { ClickhouseService } from './clickhouse.service';
-import { ConfigModule } from '@nestjs/config';
+import {Global, Module} from '@nestjs/common';
+import {ClickhouseService} from './clickhouse.service';
+import {ConfigModule} from '@nestjs/config';
 
 @Global()
 @Module({
   imports: [ConfigModule],
   providers: [ClickhouseService],
-  exports: [ClickhouseService]
+  exports: [ClickhouseService],
 })
 export class ClickhouseModule {}

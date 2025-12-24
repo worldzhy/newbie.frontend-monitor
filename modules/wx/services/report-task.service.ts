@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { RedisService } from '../../../models/redis/redis.service';
-import { MongoModelsService } from '../../../models/mongo/mongo.service';
-import { ClickhouseService } from '../../../models/clickhouse/clickhouse.service';
-import { SystemService } from '../../../modules/system/system.service';
-import { func } from '../../../shared/utils';
-import { RedisKeys } from '../../../models/enum';
+import {Injectable} from '@nestjs/common';
+import {ConfigService} from '@nestjs/config';
+import {RedisService} from '../../../models/redis/redis.service';
+import {MongoModelsService} from '../../../models/mongo/mongo.service';
+import {ClickhouseService} from '../../../models/clickhouse/clickhouse.service';
+import {SystemService} from '../../../modules/system/system.service';
+import {func} from '../../../shared/utils';
+import {RedisKeys} from '../../../models/enum';
 
 @Injectable()
 export class WxReportTaskService {
@@ -26,7 +26,7 @@ export class WxReportTaskService {
     const appAjaxs: Record<string, any[]> = {};
     const appErrors: Record<string, any[]> = {};
     for (let i = 0; i < threads; i++) {
-      await this.getWxItemDataForRedis({ appEvents, appAjaxs, appErrors });
+      await this.getWxItemDataForRedis({appEvents, appAjaxs, appErrors});
     }
     const eventIds = Object.keys(appEvents);
     for (const appId of eventIds) {
@@ -45,10 +45,22 @@ export class WxReportTaskService {
     }
   }
 
-  private async getWxItemDataForRedis({ appEvents, appAjaxs, appErrors }: { appEvents: Record<string, any[]>; appAjaxs: Record<string, any[]>; appErrors: Record<string, any[]> }) {
+  private async getWxItemDataForRedis({
+    appEvents,
+    appAjaxs,
+    appErrors,
+  }: {
+    appEvents: Record<string, any[]>;
+    appAjaxs: Record<string, any[]>;
+    appErrors: Record<string, any[]>;
+  }) {
     let query: any = await this.redis.rpop(RedisKeys.WX_REPORT_DATAS);
     if (!query) return;
-    try { query = JSON.parse(query); } catch { return; }
+    try {
+      query = JSON.parse(query);
+    } catch {
+      return;
+    }
     const querytype = query.type || 1;
     const item = await this.handleData(query);
     if (querytype === 999) {
@@ -84,10 +96,10 @@ export class WxReportTaskService {
       net: query.net,
       system: query.system,
       loc: query.loc,
-      userInfo: query.userInfo
+      userInfo: query.userInfo,
     };
     if (type === 999) {
-      item = Object.assign(item, { msg: query.msg, name: query.name, stack: query.stack, sdkVersion: query.version });
+      item = Object.assign(item, {msg: query.msg, name: query.name, stack: query.stack, sdkVersion: query.version});
     }
     return item;
   }
@@ -117,7 +129,7 @@ export class WxReportTaskService {
       pages.sdkVersion = item.system.SDKVersion;
     }
     this.setUser(pages, item);
-    if (item.ip){
+    if (item.ip) {
       let copyip = item.ip.split('.');
       copyip = `${copyip[0]}.${copyip[1]}.${copyip[2]}`;
       let datas: any = null;
@@ -130,7 +142,7 @@ export class WxReportTaskService {
         pages.city = datas.city;
       }
     }
-    
+
     await pages.save();
   }
 
@@ -219,7 +231,7 @@ export class WxReportTaskService {
       customs.customName = item.customName;
       customs.customContent = item.customContent;
       if (item.customFilter && Object.prototype.toString.apply(item.customFilter) === '[object Object]') {
-        Object.keys(item.customFilter).forEach((key) => {
+        Object.keys(item.customFilter).forEach(key => {
           if (typeof item.customFilter[key] === 'number') item.customFilter[key] = String(item.customFilter[key]);
         });
       }

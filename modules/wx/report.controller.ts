@@ -1,10 +1,10 @@
-import { Controller, Post, Headers, Body } from '@nestjs/common';
-import { SystemService } from '../../modules/system/system.service';
-import { ConfigService } from '@nestjs/config';
-import { RedisService } from '../../models/redis/redis.service';
-import { DayReportNumService } from '../../modules/day-report/day-report-num.service';
-import { func, getRandomIp } from '../../shared/utils';
-import { RedisKeys } from '../../models/enum';
+import {Controller, Post, Headers, Body} from '@nestjs/common';
+import {SystemService} from '../../modules/system/system.service';
+import {ConfigService} from '@nestjs/config';
+import {RedisService} from '../../models/redis/redis.service';
+import {DayReportNumService} from '../../modules/day-report/day-report-num.service';
+import {func, getRandomIp} from '../../shared/utils';
+import {RedisKeys} from '../../models/enum';
 
 @Controller('/api/v1/wx')
 export class WxReportController {
@@ -39,6 +39,6 @@ export class WxReportController {
     }
     await this.redis.lpush(RedisKeys.WX_REPORT_DATAS, JSON.stringify(query));
     await this.dayReportNum.redisCount(query.appId);
-    return func.result({ data: 'ok' });
+    return func.result({data: 'ok'});
   }
 }

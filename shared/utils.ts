@@ -25,11 +25,11 @@ export const func = {
     }
     return pwd + Date.now();
   },
-  result<T>(jn: Partial<{ code: number; desc: string; data: T; time?: number }> = {}) {
+  result<T>(jn: Partial<{code: number; desc: string; data: T; time?: number}> = {}) {
     // return Object.assign({ code: 1000, desc: '成功', data: '' }, jn);
     return jn.data;
   },
-  errResult<T>(jn: Partial<{ code: number; desc: string; data: T; time?: number }> = {}) {
+  errResult<T>(jn: Partial<{code: number; desc: string; data: T; time?: number}> = {}) {
     // return Object.assign({ code: 1010, desc: '请求失败', data: '' }, jn);
     return jn.data;
   },
@@ -40,15 +40,12 @@ export const func = {
       'h+': date.getHours(),
       'H+': date.getHours() > 12 ? date.getHours() - 12 : date.getHours(),
       'm+': date.getMinutes(),
-      's+': date.getSeconds()
+      's+': date.getSeconds(),
     };
     if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length));
     for (const k in o) {
       if (new RegExp('(' + k + ')').test(fmt)) {
-        fmt = fmt.replace(
-          RegExp.$1,
-          RegExp.$1.length === 1 ? String(o[k]) : ('00' + o[k]).substr(('' + o[k]).length)
-        );
+        fmt = fmt.replace(RegExp.$1, RegExp.$1.length === 1 ? String(o[k]) : ('00' + o[k]).substr(('' + o[k]).length));
       }
     }
     return fmt;

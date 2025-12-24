@@ -1,11 +1,11 @@
-import { Injectable } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import { SystemService } from "../../../modules/system/system.service";
-import { PvuvipService } from "./pvuvip.service";
-import { func } from "../../../shared/utils";
+import {Injectable} from '@nestjs/common';
+import {ConfigService} from '@nestjs/config';
+import {SystemService} from '../../../modules/system/system.service';
+import {PvuvipService} from './pvuvip.service';
+import {func} from '../../../shared/utils';
 
 function cronMinuteInterval(cronExp: string) {
-  const m = cronExp.split(" ")[1] || "*/2";
+  const m = cronExp.split(' ')[1] || '*/2';
   const match = m.match(/\*\/(\d+)/);
   const step = match ? Number(match[1]) : 2;
   return step * 60000;
@@ -40,7 +40,7 @@ export class WebPvuvipTaskService {
   }
 
   async getWebPvUvIpByDay() {
-    const todayStart = new Date(func.format(new Date(), "yyyy/MM/dd 00:00:00"));
+    const todayStart = new Date(func.format(new Date(), 'yyyy/MM/dd 00:00:00'));
     const endTime = todayStart;
     const beginTime = new Date(endTime.getTime() - 24 * 60 * 60 * 1000);
     const systems = await this.system.getWebSystemList();
@@ -48,13 +48,7 @@ export class WebPvuvipTaskService {
     await this.groupData(systems, 2, beginTime, endTime, beginTime);
   }
 
-  private async groupData(
-    datas: any[],
-    type: number,
-    beginTime: Date,
-    endTime: Date,
-    createTime: Date
-  ) {
+  private async groupData(datas: any[], type: number, beginTime: Date, endTime: Date, createTime: Date) {
     for (const sys of datas) {
       const appId = sys.appId;
       if (!appId || sys.isUse !== 0) continue;
@@ -62,19 +56,8 @@ export class WebPvuvipTaskService {
     }
   }
 
-  private async savePvUvIpData(
-    appId: string,
-    createTime: Date,
-    type: number,
-    beginTime: Date,
-    endTime: Date
-  ) {
-    const pvuvipdata = await this.pvuvip.getPvUvIpSurvey(
-      appId,
-      beginTime,
-      endTime,
-      type === 2
-    );
+  private async savePvUvIpData(appId: string, createTime: Date, type: number, beginTime: Date, endTime: Date) {
+    const pvuvipdata = await this.pvuvip.getPvUvIpSurvey(appId, beginTime, endTime, type === 2);
     await this.pvuvip.savePvUvIpData(appId, createTime, type, pvuvipdata);
   }
 }

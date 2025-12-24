@@ -1,36 +1,44 @@
-import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { ClickhouseModule } from '../../models/clickhouse/clickhouse.module';
-import { MongoModelsModule } from '../../models/mongo/mongo.module';
-import { SharedModule } from '../../shared/shared.module';
-import { DayReportModule } from '../../modules/day-report/day-report.module';
-import { RedisModule } from '../../models/redis/redis.module';
-import { SystemModule } from '../../modules/system/system.module';
+import {Module} from '@nestjs/common';
+import {ConfigModule} from '@nestjs/config';
+import {ClickhouseModule} from '../../models/clickhouse/clickhouse.module';
+import {MongoModelsModule} from '../../models/mongo/mongo.module';
+import {SharedModule} from '../../shared/shared.module';
+import {DayReportModule} from '../../modules/day-report/day-report.module';
+import {RedisModule} from '../../models/redis/redis.module';
+import {SystemModule} from '../../modules/system/system.module';
 
-import { WebReportController } from './report.controller';
+import {WebReportController} from './report.controller';
 
-import { AjaxController } from './ajax.controller';
-import { ErrorController } from './error.controller';
-import { PageController } from './page.controller';
-import { ResourceController } from './resource.controller';
-import { EnvironmentController } from './environment.controller';
-import { CustomController } from './custom.controller';
-import { PvuvipController } from './pvuvip.controller';
-import { AnalysisController } from './analysis.controller';
-import { AjaxService } from './services/ajax.service';
-import { ErrorService } from './services/error.service';
-import { PageService } from './services/page.service';
-import { ResourceService } from './services/resource.service';
-import { EnvironmentService } from './services/environment.service';
-import { AnalysisService } from './services/analysis.service';
-import { PvuvipService } from './services/pvuvip.service';
-import { WebCustomService } from './services/custom.service';
-import { WebReportTaskService } from './services/report-task.service';
-import { WebPvuvipTaskService } from './services/pvuvip-task.service';
-import { WebIpTaskService } from './services/ip-task.service';
+import {AjaxController} from './ajax.controller';
+import {ErrorController} from './error.controller';
+import {PageController} from './page.controller';
+import {ResourceController} from './resource.controller';
+import {EnvironmentController} from './environment.controller';
+import {CustomController} from './custom.controller';
+import {PvuvipController} from './pvuvip.controller';
+import {AnalysisController} from './analysis.controller';
+import {AjaxService} from './services/ajax.service';
+import {ErrorService} from './services/error.service';
+import {PageService} from './services/page.service';
+import {ResourceService} from './services/resource.service';
+import {EnvironmentService} from './services/environment.service';
+import {AnalysisService} from './services/analysis.service';
+import {PvuvipService} from './services/pvuvip.service';
+import {WebCustomService} from './services/custom.service';
+import {WebReportTaskService} from './services/report-task.service';
+import {WebPvuvipTaskService} from './services/pvuvip-task.service';
+import {WebIpTaskService} from './services/ip-task.service';
 
 @Module({
-  imports: [ConfigModule, ClickhouseModule, MongoModelsModule, SharedModule, DayReportModule, RedisModule, SystemModule],
+  imports: [
+    ConfigModule,
+    ClickhouseModule,
+    MongoModelsModule,
+    SharedModule,
+    DayReportModule,
+    RedisModule,
+    SystemModule,
+  ],
   controllers: [
     WebReportController,
     AjaxController,
@@ -40,7 +48,7 @@ import { WebIpTaskService } from './services/ip-task.service';
     EnvironmentController,
     CustomController,
     PvuvipController,
-    AnalysisController
+    AnalysisController,
   ],
   providers: [
     AjaxService,
@@ -53,8 +61,8 @@ import { WebIpTaskService } from './services/ip-task.service';
     WebCustomService,
     WebReportTaskService,
     WebPvuvipTaskService,
-    WebIpTaskService
+    WebIpTaskService,
   ],
-  exports: [WebReportTaskService, WebPvuvipTaskService, WebIpTaskService]
+  exports: [WebReportTaskService, WebPvuvipTaskService, WebIpTaskService],
 })
 export class WebModule {}

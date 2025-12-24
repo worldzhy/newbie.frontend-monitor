@@ -1,31 +1,31 @@
-import { DATA_TYPE } from 'clickhouse-orm';
-import { ClickHouseTablePrefix } from '../../enum';
+import {DATA_TYPE} from 'clickhouse-orm';
+import {ClickHouseTablePrefix} from '../../enum';
 
 export default function WebError(chOrm: any) {
   const schema = {
     tableName: ClickHouseTablePrefix.WEB_ERROR,
     schema: {
-      createTime: { type: DATA_TYPE.DateTime, default: Date.now }, // Created time
-      msg: { type: DATA_TYPE.String }, // Error message
-      name: { type: DATA_TYPE.String }, // JS error type
-      stack: { type: DATA_TYPE.String }, // Stack trace
-      target: { type: DATA_TYPE.LowCardinality(DATA_TYPE.String) }, // Resource type
-      type: { type: DATA_TYPE.LowCardinality(DATA_TYPE.String) }, // Error type
-      api: { type: DATA_TYPE.LowCardinality(DATA_TYPE.String) }, // Source API (onerror, unhandlerejection, Vue/React handlers)
-      status: { type: DATA_TYPE.String }, // HTTP status
-      col: { type: DATA_TYPE.String }, // Column
-      line: { type: DATA_TYPE.String }, // Line
-      query: { type: DATA_TYPE.String }, // HTTP query params
-      options: { type: DATA_TYPE.String }, // POST body params
-      method: { type: DATA_TYPE.LowCardinality(DATA_TYPE.String) }, // Request method
-      fullUrl: { type: DATA_TYPE.String }, // Full error resource URL
-      resourceUrl: { type: DATA_TYPE.String }, // Error resource URL
-      url: { type: DATA_TYPE.String }, // Page URL
-      markPage: { type: DATA_TYPE.String }, // Page mark
-      markUser: { type: DATA_TYPE.String }, // User mark
-      phone: { type: DATA_TYPE.String }, // User phone
-      uid: { type: DATA_TYPE.String }, // User ID
-      traceId: { type: DATA_TYPE.String }, // Trace ID
+      createTime: {type: DATA_TYPE.DateTime, default: Date.now}, // Created time
+      msg: {type: DATA_TYPE.String}, // Error message
+      name: {type: DATA_TYPE.String}, // JS error type
+      stack: {type: DATA_TYPE.String}, // Stack trace
+      target: {type: DATA_TYPE.LowCardinality(DATA_TYPE.String)}, // Resource type
+      type: {type: DATA_TYPE.LowCardinality(DATA_TYPE.String)}, // Error type
+      api: {type: DATA_TYPE.LowCardinality(DATA_TYPE.String)}, // Source API (onerror, unhandlerejection, Vue/React handlers)
+      status: {type: DATA_TYPE.String}, // HTTP status
+      col: {type: DATA_TYPE.String}, // Column
+      line: {type: DATA_TYPE.String}, // Line
+      query: {type: DATA_TYPE.String}, // HTTP query params
+      options: {type: DATA_TYPE.String}, // POST body params
+      method: {type: DATA_TYPE.LowCardinality(DATA_TYPE.String)}, // Request method
+      fullUrl: {type: DATA_TYPE.String}, // Full error resource URL
+      resourceUrl: {type: DATA_TYPE.String}, // Error resource URL
+      url: {type: DATA_TYPE.String}, // Page URL
+      markPage: {type: DATA_TYPE.String}, // Page mark
+      markUser: {type: DATA_TYPE.String}, // User mark
+      phone: {type: DATA_TYPE.String}, // User phone
+      uid: {type: DATA_TYPE.String}, // User ID
+      traceId: {type: DATA_TYPE.String}, // Trace ID
     },
     options: `ENGINE = MergeTree
     PARTITION BY toYYYYMM(createTime)

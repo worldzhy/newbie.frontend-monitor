@@ -1,12 +1,12 @@
-import { Injectable } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import { RedisService } from "../../../models/redis/redis.service";
-import { SystemService } from "../../../modules/system/system.service";
-import { ClickhouseService } from "../../../models/clickhouse/clickhouse.service";
-import { MongoModelsService } from "../../../models/mongo/mongo.service";
-import { func } from "../../../shared/utils";
-import * as UAParser from "ua-parser-js";
-import { RedisKeys } from "../../../models/enum";
+import {Injectable} from '@nestjs/common';
+import {ConfigService} from '@nestjs/config';
+import {RedisService} from '../../../models/redis/redis.service';
+import {SystemService} from '../../../modules/system/system.service';
+import {ClickhouseService} from '../../../models/clickhouse/clickhouse.service';
+import {MongoModelsService} from '../../../models/mongo/mongo.service';
+import {func} from '../../../shared/utils';
+import * as UAParser from 'ua-parser-js';
+import {RedisKeys} from '../../../models/enum';
 
 @Injectable()
 export class WebReportTaskService {
@@ -43,24 +43,21 @@ export class WebReportTaskService {
     const system = await this.system.getSystemForAppId(item.appId);
     if (!system || system.isUse !== 0) return;
     // TODO querytype === 1
-    if (system.isStatisiPages === 0 && querytype === 1)
-      await this.savePages(item, system.slowPageTime);
-    if (system.isStatisiResource === 0 || system.isStatisiAjax === 0)
-      this.forEachResources(item, system, appAjaxs);
-    if (system.isStatisiError === 0)
-      await this.collectErrors(item, appErrors);
+    if (system.isStatisiPages === 0 && querytype === 1) await this.savePages(item, system.slowPageTime);
+    if (system.isStatisiResource === 0 || system.isStatisiAjax === 0) this.forEachResources(item, system, appAjaxs);
+    if (system.isStatisiError === 0) await this.collectErrors(item, appErrors);
     if (system.isStatisiSystem === 0) await this.saveEnvironment(item);
     await this.saveCustoms(item);
   }
 
   private async savePages(item: any, slowPageTime = 5) {
     const performance = item.performance || {};
-    let newName = "";
+    let newName = '';
     try {
       const u = new URL(func.urlHelper(item.url));
-      newName = `${u.protocol}//${u.host}${u.pathname}${u.hash ? u.hash : ""}`;
+      newName = `${u.protocol}//${u.host}${u.pathname}${u.hash ? u.hash : ''}`;
     } catch {
-      newName = item.url || "";
+      newName = item.url || '';
     }
     slowPageTime = slowPageTime * 1000;
     const speedType = performance.lodt >= slowPageTime ? 2 : 1;
@@ -80,8 +77,7 @@ export class WebReportTaskService {
     if (performance.lodt !== undefined) pages.loadTime = performance.lodt;
     if (performance.reqt !== undefined) pages.requestTime = performance.reqt;
     if (performance.tcpt !== undefined) pages.tcpTime = performance.tcpt;
-    if (performance.andt !== undefined)
-      pages.analysisDomTime = performance.andt;
+    if (performance.andt !== undefined) pages.analysisDomTime = performance.andt;
     pages.screenWidth = item.screenWidth;
     pages.screenHeight = item.screenHeight;
     await pages.save();
@@ -96,16 +92,12 @@ export class WebReportTaskService {
       customs.createTime = data.createTime;
       customs.markPage = data.markPage;
       customs.markUser = data.markUser;
-      customs.path = "";
+      customs.path = '';
       customs.customName = item.customName;
       customs.customContent = item.customContent;
-      if (
-        item.customFilter &&
-        Object.prototype.toString.apply(item.customFilter) === "[object Object]"
-      ) {
-        Object.keys(item.customFilter).forEach((key) => {
-          if (typeof item.customFilter[key] === "number")
-            item.customFilter[key] = String(item.customFilter[key]);
+      if (item.customFilter && Object.prototype.toString.apply(item.customFilter) === '[object Object]') {
+        Object.keys(item.customFilter).forEach(key => {
+          if (typeof item.customFilter[key] === 'number') item.customFilter[key] = String(item.customFilter[key]);
         });
       }
       this.setUser(customs, data);
@@ -119,20 +111,18 @@ export class WebReportTaskService {
     let speedType = 1;
     let duration = Math.floor(Math.abs(item.duration || 0));
     if (duration > 60000) duration = 60000;
-    if (item.type === "link" || item.type === "css")
-      slowTime = (system.slowCssTime || 2) * 1000;
-    else if (item.type === "script")
-      slowTime = (system.slowJsTime || 2) * 1000;
-    else if (item.type === "img") slowTime = (system.slowImgTime || 2) * 1000;
+    if (item.type === 'link' || item.type === 'css') slowTime = (system.slowCssTime || 2) * 1000;
+    else if (item.type === 'script') slowTime = (system.slowJsTime || 2) * 1000;
+    else if (item.type === 'img') slowTime = (system.slowImgTime || 2) * 1000;
     else slowTime = 2000;
     speedType = duration >= slowTime ? 2 : 1;
     if (duration < slowTime) return;
-    let newName = "";
+    let newName = '';
     try {
       const u = new URL(func.urlHelper(item.name));
       newName = `${u.protocol}//${u.host}${u.pathname}`;
     } catch {
-      newName = item.name || "";
+      newName = item.name || '';
     }
     const ResourceModel = this.mongo.WebResource(data.appId);
     const resours = new ResourceModel();
@@ -145,9 +135,7 @@ export class WebReportTaskService {
     resours.method = item.method;
     resours.type = item.type;
     resours.duration = duration;
-    resours.bodySize = item.bodySize
-      ? Number(item.bodySize)
-      : 0;
+    resours.bodySize = item.bodySize ? Number(item.bodySize) : 0;
     resours.nextHopProtocol = item.nextHopProtocol;
     resours.markPage = data.markPage;
     resours.markUser = data.markUser;
@@ -158,7 +146,7 @@ export class WebReportTaskService {
   private async saveEnvironment(data: any) {
     const ip = data.ip;
     if (!ip) return;
-    let copyip = ip.split(".");
+    let copyip = ip.split('.');
     copyip = `${copyip[0]}.${copyip[1]}.${copyip[2]}`;
     let datas: any = null;
     try {
@@ -181,10 +169,10 @@ export class WebReportTaskService {
     const parser = new UAParser();
     parser.setUA(data.userAgent);
     const result = parser.getResult();
-    environment.browser = result?.browser?.name || "";
-    environment.browserVersion = result?.browser?.version || "";
-    environment.system = result?.os?.name || "";
-    environment.systemVersion = result?.os?.version || "";
+    environment.browser = result?.browser?.name || '';
+    environment.browserVersion = result?.browser?.version || '';
+    environment.system = result?.os?.name || '';
+    environment.systemVersion = result?.os?.version || '';
 
     environment.ip = data.ip;
     environment.county = data.county;
@@ -211,10 +199,10 @@ export class WebReportTaskService {
     const parser = new UAParser();
     parser.setUA(data.userAgent);
     const result = parser.getResult();
-    sdkErr.browser = result?.browser?.name || "";
-    sdkErr.browserVersion = result?.browser?.version || "";
-    sdkErr.system = result?.os?.name || "";
-    sdkErr.systemVersion = result?.os?.version || "";
+    sdkErr.browser = result?.browser?.name || '';
+    sdkErr.browserVersion = result?.browser?.version || '';
+    sdkErr.system = result?.os?.name || '';
+    sdkErr.systemVersion = result?.os?.version || '';
 
     await sdkErr.save();
   }
@@ -229,7 +217,7 @@ export class WebReportTaskService {
     const appAjaxs: Record<string, any[]> = {};
     const appErrors: Record<string, any[]> = {};
     for (let i = 0; i < count; i++) {
-      await this.getWebItemDataForRedis({ appAjaxs, appErrors });
+      await this.getWebItemDataForRedis({appAjaxs, appErrors});
     }
     for (const appId of Object.keys(appAjaxs)) {
       const model = await this.ch.WebAjax(appId);
@@ -249,9 +237,9 @@ export class WebReportTaskService {
       userAgent: query.userAgent,
       ip: query.ip,
       markPage: query.markPage || func.randomString(),
-      markUser: query.markUser || "",
-      markUv: query.markUv || "",
-      markDevice: query.markDevice || "",
+      markUser: query.markUser || '',
+      markUv: query.markUv || '',
+      markDevice: query.markDevice || '',
       url: query.url,
       p: query.p,
       uid: query.uid,
@@ -276,37 +264,24 @@ export class WebReportTaskService {
     return item;
   }
 
-  private forEachResources(
-    data: any,
-    system: any,
-    appAjaxs: Record<string, any[]>
-  ) {
+  private forEachResources(data: any, system: any, appAjaxs: Record<string, any[]>) {
     if (!data.resourceList || !data.resourceList.length) return;
     data.resourceList.forEach((item: any) => {
-      if (
-        item.type === "xmlhttprequest" ||
-        item.type === "fetchrequest" ||
-        item.type === "fetch"
-      ) {
+      if (item.type === 'xmlhttprequest' || item.type === 'fetchrequest' || item.type === 'fetch') {
         if (system.isStatisiAjax === 0) this.saveAjaxs(data, item, appAjaxs);
       } else {
-        if (system.isStatisiResource === 0)
-          this.saveResours(data, item, system);
+        if (system.isStatisiResource === 0) this.saveResours(data, item, system);
       }
     });
   }
 
-  private async saveAjaxs(
-    data: any,
-    item: any,
-    appAjaxs: Record<string, any[]>
-  ) {
-    let newName = "";
+  private async saveAjaxs(data: any, item: any, appAjaxs: Record<string, any[]>) {
+    let newName = '';
     try {
       const newurl = new URL(func.urlHelper(item.name));
       newName = `${newurl.protocol}//${newurl.host}${newurl.pathname}`;
     } catch {
-      newName = item.name || "";
+      newName = item.name || '';
     }
     const duration = Math.floor(Math.abs(item.duration || 0));
 
@@ -314,25 +289,22 @@ export class WebReportTaskService {
     const _ajax = model.build();
     _ajax.appId = data.appId;
     _ajax.createTime = data.createTime;
-    _ajax.url = newName || "";
-    _ajax.fullUrl = item.name || "";
-    _ajax.method = item.method || "";
+    _ajax.url = newName || '';
+    _ajax.fullUrl = item.name || '';
+    _ajax.method = item.method || '';
     _ajax.duration = duration;
-    _ajax.bodySize = item.bodySize
-      ? Number(item.bodySize)
-      : 0;
-    _ajax.callUrl = data.url || "";
+    _ajax.bodySize = item.bodySize ? Number(item.bodySize) : 0;
+    _ajax.callUrl = data.url || '';
     if (item.options) _ajax.options = func.filterKeyWord(item.options);
     try {
       const newurl = new URL(item.name);
-      if (newurl.searchParams.toString())
-        _ajax.query = newurl.searchParams.toString();
+      if (newurl.searchParams.toString()) _ajax.query = newurl.searchParams.toString();
     } catch {}
     if (item.traceId) _ajax.traceId = item.traceId;
     if (data.uid) _ajax.uid = String(data.uid);
     if (data.p) _ajax.phone = func.decryptPhone(data.p);
-    _ajax.markPage = data.markPage || "";
-    _ajax.markUser = data.markUser || "";
+    _ajax.markPage = data.markPage || '';
+    _ajax.markUser = data.markUser || '';
 
     const bucket = appAjaxs[data.appId];
     if (bucket) bucket.push(_ajax);
@@ -342,50 +314,46 @@ export class WebReportTaskService {
   private async collectErrors(data: any, appErrors: Record<string, any[]>) {
     if (!data.errorList || !data.errorList.length) return;
     for (const item of data.errorList) {
-      if (
-        item?.data?.resourceUrl &&
-        item.data.resourceUrl.startsWith("data://image")
-      )
-        continue;
+      if (item?.data?.resourceUrl && item.data.resourceUrl.startsWith('data://image')) continue;
 
-      let newName = "";
+      let newName = '';
       try {
-        const newurl = new URL(func.urlHelper(item?.data?.resourceUrl || ""));
+        const newurl = new URL(func.urlHelper(item?.data?.resourceUrl || ''));
         newName = `${newurl.protocol}//${newurl.host}${newurl.pathname}`;
       } catch {
-        newName = item?.data?.resourceUrl || "";
+        newName = item?.data?.resourceUrl || '';
       }
 
       const model = await this.ch.WebError(data.appId);
       const errors = model.build();
-      errors.resourceUrl = newName || "";
-      errors.fullUrl = item?.data?.resourceUrl || "";
-      errors.url = data.url || "";
+      errors.resourceUrl = newName || '';
+      errors.fullUrl = item?.data?.resourceUrl || '';
+      errors.url = data.url || '';
       errors.createTime = item.createTime ? new Date(item.createTime) : data.createTime;
 
-      if (typeof item.msg === "object") errors.msg = JSON.stringify(item.msg);
-      else if (typeof item.msg === "string") errors.msg = item.msg;
-      else errors.msg = item.msg || "";
+      if (typeof item.msg === 'object') errors.msg = JSON.stringify(item.msg);
+      else if (typeof item.msg === 'string') errors.msg = item.msg;
+      else errors.msg = item.msg || '';
 
-      errors.type = item.type || "";
-      errors.name = item.name || "";
-      errors.api = item.api || "";
+      errors.type = item.type || '';
+      errors.name = item.name || '';
+      errors.api = item.api || '';
       if (Array.isArray(item.stack)) errors.stack = JSON.stringify(item.stack);
-      errors.target = item?.data?.target || "";
-      errors.status = item?.data?.status ? String(item.data.status) : "";
-      errors.col = item?.data?.col ? String(item.data.col) : "";
-      errors.line = item?.data?.line ? String(item.data.line) : "";
-      errors.method = item.method || "";
+      errors.target = item?.data?.target || '';
+      errors.status = item?.data?.status ? String(item.data.status) : '';
+      errors.col = item?.data?.col ? String(item.data.col) : '';
+      errors.line = item?.data?.line ? String(item.data.line) : '';
+      errors.method = item.method || '';
 
       try {
-        const u = new URL(item?.data?.resourceUrl || "");
+        const u = new URL(item?.data?.resourceUrl || '');
         if (u.searchParams.toString()) errors.query = u.searchParams.toString();
       } catch {}
       if (item.options) errors.options = func.filterKeyWord(item.options);
       if (item.traceId) errors.traceId = item.traceId;
 
-      errors.markPage = data.markPage || "";
-      errors.markUser = data.markUser || "";
+      errors.markPage = data.markPage || '';
+      errors.markUser = data.markUser || '';
       if (data.uid) errors.uid = String(data.uid);
       if (data.p) errors.phone = func.decryptPhone(data.p);
 

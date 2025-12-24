@@ -1,11 +1,11 @@
-import { Controller, Post, Req, Headers, Body } from '@nestjs/common';
-import { Request } from 'express';
-import { SystemService } from '../../modules/system/system.service';
-import { ConfigService } from '@nestjs/config';
-import { func, getRandomIp } from '../../shared/utils';
-import { DayReportNumService } from '../../modules/day-report/day-report-num.service';
-import { RedisService } from '../../models/redis/redis.service';
-import { RedisKeys } from '../../models/enum';
+import {Controller, Post, Req, Headers, Body} from '@nestjs/common';
+import {Request} from 'express';
+import {SystemService} from '../../modules/system/system.service';
+import {ConfigService} from '@nestjs/config';
+import {func, getRandomIp} from '../../shared/utils';
+import {DayReportNumService} from '../../modules/day-report/day-report-num.service';
+import {RedisService} from '../../models/redis/redis.service';
+import {RedisKeys} from '../../models/enum';
 
 @Controller('/api/v1')
 export class WebReportController {
@@ -21,11 +21,7 @@ export class WebReportController {
   }
 
   @Post('/report/web')
-  async webReport(
-    @Req() req: Request,
-    @Headers() headers: Record<string, string | undefined>,
-    @Body() body: any
-  ) {
+  async webReport(@Req() req: Request, @Headers() headers: Record<string, string | undefined>, @Body() body: any) {
     let query: any = body;
 
     if (req.headers['content-type'] && req.headers['content-type'].includes('text/plain')) {
@@ -43,7 +39,7 @@ export class WebReportController {
     if (!system?.appId) throw new Error(`appId:${query.appId} 不存在`);
 
     await this.saveWebReportDataForRedis(query);
-    return func.result({ data: 'ok' });
+    return func.result({data: 'ok'});
   }
 
   private async saveWebReportDataForRedis(query: any) {

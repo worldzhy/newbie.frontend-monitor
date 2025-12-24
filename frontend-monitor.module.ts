@@ -1,4 +1,4 @@
-import {Module, MiddlewareConsumer, RequestMethod} from '@nestjs/common';
+import {Module} from '@nestjs/common';
 import {ScheduleModule} from '@nestjs/schedule';
 import {RedisModule} from './models/redis/redis.module';
 import {ClickhouseModule} from './models/clickhouse/clickhouse.module';
@@ -13,10 +13,8 @@ import {WxModule} from './modules/wx/wx.module';
 @Module({
   imports: [
     ScheduleModule.forRoot(),
-    // 引用 models 的模块
     RedisModule,
     ClickhouseModule,
-    // 提供 MongoModelsService
     MongoModelsModule,
     SharedModule,
     SystemModule,

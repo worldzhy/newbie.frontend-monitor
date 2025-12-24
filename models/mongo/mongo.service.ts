@@ -1,21 +1,21 @@
-import { Injectable } from '@nestjs/common';
-import { InjectConnection } from '@nestjs/mongoose';
-import { Connection, Schema as MongooseSchema } from 'mongoose';
+import {Injectable} from '@nestjs/common';
+import {InjectConnection} from '@nestjs/mongoose';
+import {Connection, Schema as MongooseSchema} from 'mongoose';
 
-import { SystemSchema } from './system.schema';
-import { EmailSchema } from './email.schema';
-import { DayReportNumSchema } from './day-report-num.schema';
+import {SystemSchema} from './system.schema';
+import {EmailSchema} from './email.schema';
+import {DayReportNumSchema} from './day-report-num.schema';
 
-import { WebEnvironmentSchema } from './web/web-environment.schema';
-import { WebPageSchema } from './web/web-page.schema';
-import { WebResourceSchema } from './web/web-resource.schema';
-import { WebCustomSchema, WebCustomFilterSchema } from './web/web-custom.schema';
-import { WebPvuvipSchema } from './web/web-pvuvip.schema';
+import {WebEnvironmentSchema} from './web/web-environment.schema';
+import {WebPageSchema} from './web/web-page.schema';
+import {WebResourceSchema} from './web/web-resource.schema';
+import {WebCustomSchema, WebCustomFilterSchema} from './web/web-custom.schema';
+import {WebPvuvipSchema} from './web/web-pvuvip.schema';
 
-import { WxPageSchema } from './wx/wx-page.schema';
-import { WxCustomSchema, WxCustomFilterSchema } from './wx/wx-custom.schema';
-import { WxPvuvipSchema } from './wx/wx-pvuvip.schema';
-import { MongoCollectionPrefix, MongoStaticCollection } from '../enum';
+import {WxPageSchema} from './wx/wx-page.schema';
+import {WxCustomSchema, WxCustomFilterSchema} from './wx/wx-custom.schema';
+import {WxPvuvipSchema} from './wx/wx-pvuvip.schema';
+import {MongoCollectionPrefix, MongoStaticCollection} from '../enum';
 
 @Injectable()
 export class MongoModelsService {

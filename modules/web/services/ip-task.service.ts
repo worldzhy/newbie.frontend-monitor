@@ -1,11 +1,11 @@
-import { Injectable } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import { MongoModelsService } from "../../../models/mongo/mongo.service";
-import { RedisService } from "../../../models/redis/redis.service";
-import { SystemService } from "../../../modules/system/system.service";
-import { func } from "../../../shared/utils";
-import * as https from "https";
-import { RedisKeyPrefix } from "../../../models/enum";
+import {Injectable} from '@nestjs/common';
+import {ConfigService} from '@nestjs/config';
+import {MongoModelsService} from '../../../models/mongo/mongo.service';
+import {RedisService} from '../../../models/redis/redis.service';
+import {SystemService} from '../../../modules/system/system.service';
+import {func} from '../../../shared/utils';
+import * as https from 'https';
+import {RedisKeyPrefix} from '../../../models/enum';
 
 @Injectable()
 export class WebIpTaskService {
@@ -31,19 +31,17 @@ export class WebIpTaskService {
 
   private async saveWebGetIpDatasByOne(appId: string) {
     try {
-      const query: any = { city: { $exists: false } };
+      const query: any = {city: {$exists: false}};
       const beginTime = await this.redis.get(`${RedisKeyPrefix.IP_TASK_BEGIN_TIME}${appId}`);
       query.createTime = {
-        $gt: beginTime
-          ? new Date(beginTime)
-          : new Date(Date.now() - this.cfg.ip_task_space_time),
+        $gt: beginTime ? new Date(beginTime) : new Date(Date.now() - this.cfg.ip_task_space_time),
       };
       const datas = await this.mongo
         .WebEnvironment(appId)
         .find(query)
-        .read("secondaryPreferred")
+        .read('secondaryPreferred')
         .limit(this.cfg.ip_thread * 60)
-        .sort({ createTime: 1 })
+        .sort({createTime: 1})
         .exec();
       if (datas && datas.length) {
         for (let i = 0; i < this.cfg.ip_thread; i++) {
@@ -51,10 +49,7 @@ export class WebIpTaskService {
           await this.handleDatas(appId, newSpit, datas.length);
         }
       } else {
-        await this.redis.set(
-          `${RedisKeyPrefix.IP_TASK_BEGIN_TIME}${appId}`,
-          new Date().toString()
-        );
+        await this.redis.set(`${RedisKeyPrefix.IP_TASK_BEGIN_TIME}${appId}`, new Date().toString());
       }
     } catch (err) {
       console.log(err);
@@ -68,15 +63,12 @@ export class WebIpTaskService {
       await this.getIpData(ip, data[i]._id, data[i].appId);
     }
     if (lastLen === 0) {
-      await this.redis.set(
-        `${RedisKeyPrefix.IP_TASK_BEGIN_TIME}${appId}`,
-        data[data.length - 1].createTime
-      );
+      await this.redis.set(`${RedisKeyPrefix.IP_TASK_BEGIN_TIME}${appId}`, data[data.length - 1].createTime);
     }
   }
 
   private async getIpData(ip: string, _id: string, appId: string) {
-    let _copyip = ip.split(".");
+    let _copyip = ip.split('.');
     const copyip = `${_copyip[0]}.${_copyip[1]}.${_copyip[2]}`;
     let datas = await this.redis.get(copyip);
     if (datas) {
@@ -91,10 +83,10 @@ export class WebIpTaskService {
   private httpGetJson(url: string): Promise<any> {
     return new Promise((resolve, reject) => {
       https
-        .get(url, (res) => {
-          let data = "";
-          res.on("data", (chunk) => (data += chunk));
-          res.on("end", () => {
+        .get(url, res => {
+          let data = '';
+          res.on('data', chunk => (data += chunk));
+          res.on('end', () => {
             try {
               resolve(JSON.parse(data));
             } catch (e) {
@@ -102,16 +94,11 @@ export class WebIpTaskService {
             }
           });
         })
-        .on("error", reject);
+        .on('error', reject);
     });
   }
 
-  private async getIpDataByTencentApi(
-    ip: string,
-    _id: string,
-    copyip: string,
-    appId: string
-  ) {
+  private async getIpDataByTencentApi(ip: string, _id: string, copyip: string, appId: string) {
     if (func.isSkipIp(ip) || !this.cfg.TENCENTMAPKEY) return;
     try {
       const url = `https://apis.map.qq.com/ws/location/v1/ip?ip=${ip}&key=${this.cfg.TENCENTMAPKEY}`;
@@ -122,12 +109,7 @@ export class WebIpTaskService {
           province: result.result.ad_info.province,
           city: result.result.ad_info.city,
         };
-        await this.redis.set(
-          copyip,
-          JSON.stringify(json),
-          "EX",
-          this.cfg.ipRedisTTL
-        );
+        await this.redis.set(copyip, JSON.stringify(json), 'EX', this.cfg.ipRedisTTL);
         return await this.updateWebEnvironment(json, _id, appId);
       }
       return {};
@@ -140,11 +122,7 @@ export class WebIpTaskService {
   private async updateWebEnvironment(data: any, id: string, appId: string) {
     return await this.mongo
       .WebEnvironment(appId)
-      .updateOne(
-        { _id: id },
-        { $set: { province: data.province, city: data.city } },
-        { upsert: true }
-      )
+      .updateOne({_id: id}, {$set: {province: data.province, city: data.city}}, {upsert: true})
       .exec();
   }
 }

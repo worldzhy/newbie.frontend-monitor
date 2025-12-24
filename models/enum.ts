@@ -41,4 +41,3 @@ export enum RedisKeyPrefix {
   WX_IP_TASK_BEGIN_TIME = 'WxIpTaskBeginTime_',
   DAY_REPORT_NUM = 'DayReportNum_',
 }
-

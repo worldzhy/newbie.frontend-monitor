@@ -1,16 +1,29 @@
-import { Injectable } from '@nestjs/common';
-import { ClickhouseService } from '../../../models/clickhouse/clickhouse.service';
-import { ConfigService } from '@nestjs/config';
+import {Injectable} from '@nestjs/common';
+import {ClickhouseService} from '../../../models/clickhouse/clickhouse.service';
+import {ConfigService} from '@nestjs/config';
 
 @Injectable()
 export class ErrorService {
   private cfg: any;
-  constructor(private readonly ch: ClickhouseService, private readonly config: ConfigService) {
+  constructor(
+    private readonly ch: ClickhouseService,
+    private readonly config: ConfigService
+  ) {
     this.cfg = this.config.get('microservices.frontend-monitor');
   }
 
   async getAverageErrorList(query: any) {
-    const { appId, beginTime, endTime, type = '', realTime, resourceUrl, pageSize = this.cfg.pageSize, uid, phone } = query;
+    const {
+      appId,
+      beginTime,
+      endTime,
+      type = '',
+      realTime,
+      resourceUrl,
+      pageSize = this.cfg.pageSize,
+      uid,
+      phone,
+    } = query;
     let pageNo = Number(query.pageNo || 1);
     const wheres: string[] = [];
     if (resourceUrl) wheres.push(`ilike(resourceUrl,'%${resourceUrl}%')`);
@@ -26,10 +39,16 @@ export class ErrorService {
     const model = await this.ch.WebError(appId);
 
     if (String(realTime) === '1') {
-      const total = await model.find({ where, select: 'count() as total' });
-      const list = await model.find({ where, select: '*', limit: pageSize, skip: (pageNo - 1) * pageSize, orderBy: 'createTime DESC' });
-      list.forEach((item: any) => (item._id = { ...item }));
-      return { dataList: list, totalNum: total?.[0]?.total || 0, pageNo };
+      const total = await model.find({where, select: 'count() as total'});
+      const list = await model.find({
+        where,
+        select: '*',
+        limit: pageSize,
+        skip: (pageNo - 1) * pageSize,
+        orderBy: 'createTime DESC',
+      });
+      list.forEach((item: any) => (item._id = {...item}));
+      return {dataList: list, totalNum: total?.[0]?.total || 0, pageNo};
     }
 
     let groupBy = '';
@@ -39,22 +58,22 @@ export class ErrorService {
     else if (type === 'bussiness-ajax|bussiness-fetch') groupBy = 'resourceUrl,status,type';
     else if (type === 'log') groupBy = 'resourceUrl,type';
 
-    const countQuery = model.find([{ where, groupBy, select: 'COUNT()' }, { select: 'count() as total' }]);
+    const countQuery = model.find([{where, groupBy, select: 'COUNT()'}, {select: 'count() as total'}]);
     const listQuery = model.find({
       where,
       select: `${groupBy}, MAX(createTime) AS lastCreateTime,COUNT() AS count,COUNT(DISTINCT markUser) AS userNum,groupArray(msg)[1] AS lastMsg`,
       groupBy,
       limit: pageSize,
       skip: (pageNo - 1) * pageSize,
-      orderBy: 'count DESC'
+      orderBy: 'count DESC',
     });
     const [count, list] = await Promise.all([countQuery, listQuery]);
-    list.forEach((item: any) => (item._id = { ...item }));
-    return { dataList: list, totalNum: count?.[0]?.total || 0, pageNo };
+    list.forEach((item: any) => (item._id = {...item}));
+    return {dataList: list, totalNum: count?.[0]?.total || 0, pageNo};
   }
 
   async getOneErrorList(query: any) {
-    const { appId, url, name = '', status = '', type = '', beginTime, endTime, phone = '', uid = '' } = query;
+    const {appId, url, name = '', status = '', type = '', beginTime, endTime, phone = '', uid = ''} = query;
     let pageNo = Number(query.pageNo || 1);
     let pageSize = Number(query.pageSize || this.cfg.pageSize);
     const wheres: string[] = [];
@@ -68,30 +87,42 @@ export class ErrorService {
     if (endTime) wheres.push(`createTime<=toDateTime('${endTime}')`);
     const where = wheres.length ? wheres.join(' and ') : undefined;
     const model = await this.ch.WebError(appId);
-    const countQuery = model.find({ where, select: 'count() as total' });
-    const listQuery = model.find({ where, select: '*', limit: pageSize, skip: (pageNo - 1) * pageSize, orderBy: 'createTime DESC' });
+    const countQuery = model.find({where, select: 'count() as total'});
+    const listQuery = model.find({
+      where,
+      select: '*',
+      limit: pageSize,
+      skip: (pageNo - 1) * pageSize,
+      orderBy: 'createTime DESC',
+    });
     const groupBy = 'resourceUrl';
     const otherQuery = model.find({
       where,
       select: `${groupBy},MIN(createTime) AS first,MAX(createTime) AS last,COUNT() AS count,COUNT(DISTINCT markUser) AS userNum`,
       limit: pageSize,
-      groupBy
+      groupBy,
     });
     const [count, list, other] = await Promise.all([countQuery, listQuery, otherQuery]);
-    list.forEach((item: any) => (item._id = { ...item }));
-    let userNum = 0, first = '', last = '';
-    if (other.length > 0) { userNum = other[0].userNum; first = other[0].first; last = other[0].last; }
-    return { dataList: list, totalNum: count?.[0]?.total || 0, pageNo, first, last, userNum };
+    list.forEach((item: any) => (item._id = {...item}));
+    let userNum = 0,
+      first = '',
+      last = '';
+    if (other.length > 0) {
+      userNum = other[0].userNum;
+      first = other[0].first;
+      last = other[0].last;
+    }
+    return {dataList: list, totalNum: count?.[0]?.total || 0, pageNo, first, last, userNum};
   }
 
-  async getMarkUserErrorListCH(appId: string, opts: { markUser?: string; beginTime?: string; endTime?: string }) {
+  async getMarkUserErrorListCH(appId: string, opts: {markUser?: string; beginTime?: string; endTime?: string}) {
     const wheres: string[] = [];
     if (opts.markUser) wheres.push(`markUser='${opts.markUser}'`);
     if (opts.beginTime) wheres.push(`createTime>=toDateTime('${opts.beginTime}')`);
     if (opts.endTime) wheres.push(`createTime<=toDateTime('${opts.endTime}')`);
     const where = wheres.length ? wheres.join(' and ') : undefined;
     const model = await this.ch.WebError(appId);
-    const list = await model.find({ where, select: '*', orderBy: 'createTime ASC' });
-    return { list };
+    const list = await model.find({where, select: '*', orderBy: 'createTime ASC'});
+    return {list};
   }
 }

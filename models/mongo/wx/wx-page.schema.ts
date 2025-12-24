@@ -1,12 +1,12 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Schema as MongooseSchema } from 'mongoose';
+import {Prop, Schema, SchemaFactory} from '@nestjs/mongoose';
+import {Document, Schema as MongooseSchema} from 'mongoose';
 
-@Schema({ shardKey: { _id: 'hashed' } })
+@Schema({shardKey: {_id: 'hashed'}})
 export class WxPage {
   @Prop() appId: string; // App ID
-  @Prop({ default: Date.now }) createTime: Date; // Created time
+  @Prop({default: Date.now}) createTime: Date; // Created time
   @Prop() path: string; // Current path
-  @Prop({ type: MongooseSchema.Types.Mixed }) options: any; // Path params
+  @Prop({type: MongooseSchema.Types.Mixed}) options: any; // Path params
   @Prop() markPage: string; // Page mark
   @Prop() markUser: string; // User mark
   @Prop() markUv: string; // UV mark
@@ -30,6 +30,6 @@ export class WxPage {
 }
 export type WxPageDocument = WxPage & Document;
 export const WxPageSchema = SchemaFactory.createForClass(WxPage);
-WxPageSchema.index({ createTime: -1 });
-WxPageSchema.index({ markPage: -1 });
-WxPageSchema.index({ markUser: -1 });
+WxPageSchema.index({createTime: -1});
+WxPageSchema.index({markPage: -1});
+WxPageSchema.index({markUser: -1});

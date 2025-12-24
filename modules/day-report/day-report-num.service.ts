@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
-import { MongoModelsService } from '../../models/mongo/mongo.service';
-import { RedisService } from '../../models/redis/redis.service';
-import { ConfigService } from '@nestjs/config';
+import {Injectable} from '@nestjs/common';
+import {MongoModelsService} from '../../models/mongo/mongo.service';
+import {RedisService} from '../../models/redis/redis.service';
+import {ConfigService} from '@nestjs/config';
 import * as moment from 'moment';
-import { func } from '../../shared/utils';
-import { RedisKeyPrefix } from '../../models/enum';
+import {func} from '../../shared/utils';
+import {RedisKeyPrefix} from '../../models/enum';
 
 @Injectable()
 export class DayReportNumService {
@@ -49,10 +49,13 @@ export class DayReportNumService {
       appId,
       dayTime: {
         $gte: new Date(moment(beginTime).format('YYYY-MM-DD 00:00:00')),
-        $lte: new Date(moment(endTime).format('YYYY-MM-DD 23:59:59'))
-      }
+        $lte: new Date(moment(endTime).format('YYYY-MM-DD 23:59:59')),
+      },
     };
-    return (await this.mongo.DayReportNum().findOne(query, { num: 1, dayTime: 1 }).read('secondaryPreferred').exec()) || ({} as any);
+    return (
+      (await this.mongo.DayReportNum().findOne(query, {num: 1, dayTime: 1}).read('secondaryPreferred').exec()) ||
+      ({} as any)
+    );
   }
 
   async redisCount(appId: string) {

@@ -1,14 +1,14 @@
-import { Injectable, OnModuleInit } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import { ClickhouseOrm } from "clickhouse-orm";
+import {Injectable, OnModuleInit} from '@nestjs/common';
+import {ConfigService} from '@nestjs/config';
+import {ClickhouseOrm} from 'clickhouse-orm';
 
-import WebAjaxFactory from "./web/ajax";
-import WebErrorFactory from "./web/error";
-import WebSdkErrorFactory from "./web/sdk-error";
-import WxAjaxFactory from "./wx/ajax";
-import WxErrorFactory from "./wx/error";
-import WxEventFactory from "./wx/event";
-import WxSdkErrorFactory from "./wx/sdk-error";
+import WebAjaxFactory from './web/ajax';
+import WebErrorFactory from './web/error';
+import WebSdkErrorFactory from './web/sdk-error';
+import WxAjaxFactory from './wx/ajax';
+import WxErrorFactory from './wx/error';
+import WxEventFactory from './wx/event';
+import WxSdkErrorFactory from './wx/sdk-error';
 
 @Injectable()
 export class ClickhouseService implements OnModuleInit {
@@ -25,50 +25,49 @@ export class ClickhouseService implements OnModuleInit {
   constructor(private readonly configService: ConfigService) {}
 
   async onModuleInit() {
-    const raw = this.configService.get("app.clickhouse");
+    const raw = this.configService.get('app.clickhouse');
     const cfg = (() => {
-      if (typeof raw === "string") {
-        const [ch_host, ch_port, ch_username, ch_password, ch_db, ch_cluster] =
-          raw.split(":");
-        const url = (ch_host || "localhost").startsWith("http")
-          ? ch_host || "localhost"
-          : `http://${ch_host || "localhost"}`;
+      if (typeof raw === 'string') {
+        const [ch_host, ch_port, ch_username, ch_password, ch_db, ch_cluster] = raw.split(':');
+        const url = (ch_host || 'localhost').startsWith('http')
+          ? ch_host || 'localhost'
+          : `http://${ch_host || 'localhost'}`;
         return {
           url,
           port: ch_port ? Number(ch_port) : 8123,
-          db: ch_db || "web_monitor",
-          username: ch_username || "default",
-          password: ch_password || "",
+          db: ch_db || 'web_monitor',
+          username: ch_username || 'default',
+          password: ch_password || '',
           debug: false,
           cluster: ch_cluster || false,
         };
       }
       return (
         raw || {
-          url: "http://localhost",
+          url: 'http://localhost',
           port: 8123,
-          db: "web_monitor",
-          username: "default",
-          password: "",
+          db: 'web_monitor',
+          username: 'default',
+          password: '',
           debug: false,
           cluster: false,
         }
       );
     })();
     const basicAuth = {
-      username: cfg.username || "default",
-      password: cfg.password || "",
+      username: cfg.username || 'default',
+      password: cfg.password || '',
     };
     const chOrm = ClickhouseOrm({
-      db: { name: cfg.db, cluster: cfg.cluster || false },
+      db: {name: cfg.db, cluster: cfg.cluster || false},
       debug: cfg.debug || false,
       client: {
-        url: cfg.url || "http://localhost",
+        url: cfg.url || 'http://localhost',
         port: cfg.port || 8123,
         basicAuth,
         debug: false,
         isUseGzip: true,
-        format: "json",
+        format: 'json',
       },
     });
     await chOrm.createDatabase();

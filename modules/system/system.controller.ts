@@ -1,6 +1,6 @@
-import { Controller, Get, Post, Body, Query } from '@nestjs/common';
-import { SystemService } from './system.service';
-import { func } from '../../shared/utils';
+import {Controller, Get, Post, Body, Query} from '@nestjs/common';
+import {SystemService} from './system.service';
+import {func} from '../../shared/utils';
 
 @Controller('/api/v1/system')
 export class SystemController {
@@ -21,19 +21,19 @@ export class SystemController {
   @Get('/getSysForUserId')
   async getSysForUserId(@Query() query: any) {
     const result = await this.system.getSysForUserId(query);
-    return func.result({ data: result });
+    return func.result({data: result});
   }
 
   @Get('/getSystemForId')
   async getSystemForId(@Query('appId') appId: string) {
     const result = await this.system.getSystemForDb(appId);
-    return func.result({ data: result });
+    return func.result({data: result});
   }
 
   @Get('/web/list')
   async getWebSystemList() {
     const result = await this.system.getWebSystemList();
-    return func.result({ data: result });
+    return func.result({data: result});
   }
 
   @Post('/deleteUser')
@@ -43,7 +43,7 @@ export class SystemController {
     if (!appId) throw new Error('删除系统中某个用户：appId不能为空');
     if (!userToken) throw new Error('删除系统中某个用户：用户Token不能为空');
     const result = await this.system.deleteWebSystemUser(appId, userToken);
-    return func.result({ data: result });
+    return func.result({data: result});
   }
 
   @Post('/addUser')
@@ -53,7 +53,7 @@ export class SystemController {
     if (!appId) throw new Error('系统中新增某个用户：appId不能为空');
     if (!userToken) throw new Error('系统中新增某个用户：用户Token不能为空');
     const result = await this.system.addWebSystemUser(appId, userToken);
-    return func.result({ data: result });
+    return func.result({data: result});
   }
 
   @Post('/deleteSystem')
@@ -62,7 +62,7 @@ export class SystemController {
     const type = body.type;
     if (!appId) throw new Error('删除某个系统：appId不能为空');
     const result = await this.system.deleteSystem(appId, type);
-    return func.result({ data: result });
+    return func.result({data: result});
   }
 
   @Post('/handleDaliyEmail')
@@ -73,6 +73,6 @@ export class SystemController {
     const item = body.item || 1;
     if (!appId) throw new Error('appId不能为空');
     const result = await this.system.handleDaliyEmail(appId, email, type, true, item);
-    return func.result({ data: result });
+    return func.result({data: result});
   }
 }
