@@ -256,6 +256,7 @@ export class WebReportTaskService {
       });
     } else if (type === 2 || type === 3 || type === 4 || type === 5) {
       item = Object.assign(item, {
+        isFirstIn: query.isFirstIn ? 2 : 1,
         errorList: query.errorList,
         resourceList: query.resourceList,
         customs: query.customs,

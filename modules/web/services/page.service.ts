@@ -14,8 +14,11 @@ export class PageService {
   }
 
   async getAveragePageList(query: any) {
-    const {appId, type = '', pageNo = 1, pageSize = this.cfg.pageSize, url, isFirstIn = 1} = query;
-    const match: any = {isFirstIn: Number(isFirstIn)};
+    const {appId, type = '', pageNo = 1, pageSize = this.cfg.pageSize, url, isFirstIn} = query;
+    const match: any = {};
+    if (isFirstIn) {
+      match.isFirstIn = Number(isFirstIn);
+    }
     func.setMatchTime(query, match);
     if (type) match.speedType = Number(type);
     if (url) match.url = {$regex: new RegExp(url, 'i')};
@@ -30,22 +33,29 @@ export class PageService {
     const distinct = (await model.distinct('url', match).read('secondaryPreferred').exec()) || [];
     const copdistinct = distinct.slice();
     const slice = distinct.slice((pageNo - 1) * pageSize, (pageNo - 1) * pageSize + pageSize);
+    let $group: any = {
+      _id: {url: '$url'},
+      count: {$sum: 1},
+    };
+    // if has isFirstIn is first mode,or is visit mode
+    if (match.hasOwnProperty('isFirstIn')) {
+      $group = {
+        ...$group,
+        loadTime: {$avg: '$loadTime'},
+        dnsTime: {$avg: '$dnsTime'},
+        tcpTime: {$avg: '$tcpTime'},
+        whiteTime: {$avg: '$whiteTime'},
+        requestTime: {$avg: '$requestTime'},
+        analysisDomTime: {$avg: '$analysisDomTime'},
+      };
+    }
     const jobs = slice.map((url: string) =>
       this.mongo
         .WebPage(appId)
         .aggregate([
           {$match: {...match, url}},
           {
-            $group: {
-              _id: {url: '$url'},
-              count: {$sum: 1},
-              loadTime: {$avg: '$loadTime'},
-              dnsTime: {$avg: '$dnsTime'},
-              tcpTime: {$avg: '$tcpTime'},
-              whiteTime: {$avg: '$whiteTime'},
-              requestTime: {$avg: '$requestTime'},
-              analysisDomTime: {$avg: '$analysisDomTime'},
-            },
+            $group,
           },
         ])
         .read('secondaryPreferred')
