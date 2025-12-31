@@ -164,8 +164,9 @@ export class PageService {
   }
 
   async getOnePageList(query: any) {
-    const {appId, type, pageNo = 1, pageSize = this.cfg.pageSize, url, firstIn = 2, beginTime, endTime} = query;
-    const match: any = {url, isFirstIn: Number(firstIn)};
+    const {appId, type, pageNo = 1, pageSize = this.cfg.pageSize, url, isFirstIn, beginTime, endTime} = query;
+    const match: any = {url};
+    if (isFirstIn) match.isFirstIn = Number(isFirstIn);
     if (type) match.speedType = Number(type);
     if (beginTime && endTime)
       match.createTime = {

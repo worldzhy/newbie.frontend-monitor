@@ -46,7 +46,7 @@ export class WebReportTaskService {
     if (system.isStatisiPages === 0 && querytype === 1) await this.savePages(item, system.slowPageTime);
     if (system.isStatisiResource === 0 || system.isStatisiAjax === 0) this.forEachResources(item, system, appAjaxs);
     if (system.isStatisiError === 0) await this.collectErrors(item, appErrors);
-    if (system.isStatisiSystem === 0) await this.saveEnvironment(item);
+    if (system.isStatisiSystem === 0 && querytype === 1) await this.saveEnvironment(item);
     await this.saveCustoms(item);
   }
 
@@ -127,7 +127,7 @@ export class WebReportTaskService {
     const ResourceModel = this.mongo.WebResource(data.appId);
     const resours = new ResourceModel();
     resours.appId = data.appId;
-    resours.createTime = data.createTime;
+    resours.createTime = item.requestTime ? new Date(item.requestTime) : data.createTime;
     resours.url = data.url;
     resours.fullUrl = item.name;
     resours.speedType = speedType;
@@ -244,22 +244,18 @@ export class WebReportTaskService {
       p: query.p,
       uid: query.uid,
     };
-    if (type === 1) {
+    item = Object.assign(item, {
+      isFirstIn: query.isFirstIn ? 2 : 1,
+      errorList: query.errorList,
+      resourceList: query.resourceList,
+      customs: query.customs,
+    });
+    if (query.isFirstIn) {
       item = Object.assign(item, {
-        isFirstIn: query.isFirstIn ? 2 : 1,
         preUrl: query.preUrl,
         performance: query.performance,
-        errorList: query.errorList,
-        resourceList: query.resourceList,
         screenWidth: query.screenWidth,
         screenHeight: query.screenHeight,
-      });
-    } else if (type === 2 || type === 3 || type === 4 || type === 5) {
-      item = Object.assign(item, {
-        isFirstIn: query.isFirstIn ? 2 : 1,
-        errorList: query.errorList,
-        resourceList: query.resourceList,
-        customs: query.customs,
       });
     }
     return item;
@@ -289,7 +285,7 @@ export class WebReportTaskService {
     const model = await this.ch.WebAjax(data.appId);
     const _ajax = model.build();
     _ajax.appId = data.appId;
-    _ajax.createTime = data.createTime;
+    _ajax.createTime = item.requestTime ? new Date(item.requestTime) : data.createTime;
     _ajax.url = newName || '';
     _ajax.fullUrl = item.name || '';
     _ajax.method = item.method || '';

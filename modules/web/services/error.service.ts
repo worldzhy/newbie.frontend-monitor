@@ -119,7 +119,7 @@ export class ErrorService {
     const wheres: string[] = [];
     if (opts.markUser) wheres.push(`markUser='${opts.markUser}'`);
     if (opts.beginTime) wheres.push(`createTime>=toDateTime('${opts.beginTime}')`);
-    if (opts.endTime) wheres.push(`createTime<=toDateTime('${opts.endTime}')`);
+    if (opts.endTime) wheres.push(`createTime<toDateTime('${opts.endTime}')`);
     const where = wheres.length ? wheres.join(' and ') : undefined;
     const model = await this.ch.WebError(appId);
     const list = await model.find({where, select: '*', orderBy: 'createTime ASC'});

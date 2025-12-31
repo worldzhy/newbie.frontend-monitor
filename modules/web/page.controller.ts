@@ -29,8 +29,8 @@ export class PageController {
   @Get('/getOnePageList')
   async getOnePageList(@Query() q: any) {
     const {appId, url} = q;
-    if (!appId) throw new Error('单个页面性能列表：appId不能为空');
-    if (!url) throw new Error('单个页面性能列表：url不能为空');
+    if (!appId) throw new Error('单个页面性能或访问列表：appId不能为空');
+    if (!url) throw new Error('单个页面性能或访问列表：url不能为空');
     const result = await this.pageSrv.getOnePageList(q);
     return func.result({data: result});
   }
