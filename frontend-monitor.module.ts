@@ -9,6 +9,7 @@ import {DayReportModule} from './modules/day-report/day-report.module';
 import {MongoModelsModule} from './models/mongo/mongo.module';
 import {WebModule} from './modules/web/web.module';
 import {WxModule} from './modules/wx/wx.module';
+import {RemoveModule} from './modules/remove/remove.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import {WxModule} from './modules/wx/wx.module';
     JobsModule,
     WebModule,
     WxModule,
+    RemoveModule,
   ],
   providers: [],
 })
