@@ -6,7 +6,7 @@ import {ClickhouseService} from '../../../models/clickhouse/clickhouse.service';
 import {MongoModelsService} from '../../../models/mongo/mongo.service';
 import {func} from '../../../shared/utils';
 import * as UAParser from 'ua-parser-js';
-import {RedisKeys} from '../../../models/enum';
+import {RedisKeys, ReportType} from '../../../models/enum';
 
 @Injectable()
 export class WebReportTaskService {
@@ -34,19 +34,19 @@ export class WebReportTaskService {
     } catch {
       return;
     }
-    const querytype = query.type || 1;
+    const querytype = query.type || ReportType.PagePerf;
     const item = await this.handleWebData(query);
-    if (query.type === 999) {
+    if (query.type === ReportType.SdkError) {
       await this.saveSdkError(item);
       return;
     }
     const system = await this.system.getSystemForAppId(item.appId);
     if (!system || system.isUse !== 0) return;
-    // TODO querytype === 1
-    if (system.isStatisiPages === 0 && querytype === 1) await this.savePages(item, system.slowPageTime);
+    // TODO querytype === 'PagePerf'
+    if (system.isStatisiPages === 0 && querytype === ReportType.PagePerf) await this.savePages(item, system.slowPageTime);
     if (system.isStatisiResource === 0 || system.isStatisiAjax === 0) this.forEachResources(item, system, appAjaxs);
     if (system.isStatisiError === 0) await this.collectErrors(item, appErrors);
-    if (system.isStatisiSystem === 0 && querytype === 1) await this.saveEnvironment(item);
+    if (system.isStatisiSystem === 0 && querytype === ReportType.PagePerf) await this.saveEnvironment(item);
     await this.saveCustoms(item);
   }
 
@@ -230,7 +230,7 @@ export class WebReportTaskService {
   }
 
   private async handleWebData(query: any) {
-    const type = query.type || 1;
+    const type = query.type || ReportType.PagePerf;
     let item: any = {
       appId: query.appId,
       createTime: new Date(query.time),
@@ -245,7 +245,7 @@ export class WebReportTaskService {
       uid: query.uid,
     };
     item = Object.assign(item, {
-      isFirstIn: query.isFirstIn ? 2 : 1,
+      isFirstIn: query.isFirstIn || false,
       errorList: query.errorList,
       resourceList: query.resourceList,
       customs: query.customs,

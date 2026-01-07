@@ -16,8 +16,8 @@ export class PageService {
   async getAveragePageList(query: any) {
     const {appId, type = '', pageNo = 1, pageSize = this.cfg.pageSize, url, isFirstIn} = query;
     const match: any = {};
-    if (isFirstIn) {
-      match.isFirstIn = Number(isFirstIn);
+    if (isFirstIn !== undefined && isFirstIn !== '') {
+      match.isFirstIn = isFirstIn === 'true' ? true : false;
     }
     func.setMatchTime(query, match);
     if (type) match.speedType = Number(type);
@@ -97,7 +97,7 @@ export class PageService {
 
   async getRealTimeAveragePageList(query: any) {
     const {appId, type = '', beginTime, endTime} = query;
-    const match: any = {isFirstIn: 2};
+    const match: any = {isFirstIn: true};
     if (type) match.speedType = Number(type);
     const _querys: any = this.getSpaceTime(beginTime, endTime, 60000);
     const result = await this.mongo
@@ -166,7 +166,14 @@ export class PageService {
   async getOnePageList(query: any) {
     const {appId, type, pageNo = 1, pageSize = this.cfg.pageSize, url, isFirstIn, beginTime, endTime} = query;
     const match: any = {url};
-    if (isFirstIn) match.isFirstIn = Number(isFirstIn);
+    if (isFirstIn !== undefined && isFirstIn !== '') {
+      const isFirstInNum = Number(isFirstIn);
+      if (!isNaN(isFirstInNum)) {
+        match.isFirstIn = isFirstInNum === 2;
+      } else {
+        match.isFirstIn = isFirstIn === 'true' || isFirstIn === true;
+      }
+    }
     if (type) match.speedType = Number(type);
     if (beginTime && endTime)
       match.createTime = {

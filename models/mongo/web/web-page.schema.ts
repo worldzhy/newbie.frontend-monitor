@@ -9,7 +9,7 @@ export class WebPage {
   @Prop() fullUrl: string; // Full URL
   @Prop() preUrl: string; // Referrer URL
   @Prop() speedType: number; // 1: normal, 2: slow
-  @Prop() isFirstIn: number; // 2: first in session, 1: not first
+  @Prop() isFirstIn: boolean; // true: first in session, false: not first
   @Prop() markPage: string; // Page mark
   @Prop() markUser: string; // User mark
   @Prop() loadTime: number; // Full load time (ms)

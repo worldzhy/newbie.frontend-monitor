@@ -5,7 +5,7 @@ import {MongoModelsService} from '../../../models/mongo/mongo.service';
 import {ClickhouseService} from '../../../models/clickhouse/clickhouse.service';
 import {SystemService} from '../../../modules/system/system.service';
 import {func} from '../../../shared/utils';
-import {RedisKeys} from '../../../models/enum';
+import {RedisKeys, ReportType} from '../../../models/enum';
 
 @Injectable()
 export class WxReportTaskService {
@@ -61,15 +61,15 @@ export class WxReportTaskService {
     } catch {
       return;
     }
-    const querytype = query.type || 1;
+    const querytype = query.type || ReportType.PagePerf;
     const item = await this.handleData(query);
-    if (querytype === 999) {
+    if (querytype === ReportType.SdkError) {
       await this.saveSdkError(item);
       return;
     }
     const system = await this.system.getSystemForAppId(item.appId);
     if (!system || system.isUse !== 0) return;
-    if (system.isStatisiSystem === 0 && querytype === 1) await this.savePages(item);
+    if (system.isStatisiSystem === 0 && querytype === ReportType.PagePerf) await this.savePages(item);
     if (system.isStatisiAjax === 0) this.saveAjaxs(item, appAjaxs);
     if (system.isStatisiError === 0) this.saveErrors(item, appErrors);
     await this.saveCustoms(item);
@@ -77,7 +77,7 @@ export class WxReportTaskService {
   }
 
   private async handleData(query: any) {
-    const type = query.type || 1;
+    const type = query.type || ReportType.PagePerf;
     let item: any = {
       appId: query.appId,
       createTime: query.time ? new Date(query.time) : new Date(),
@@ -98,7 +98,7 @@ export class WxReportTaskService {
       loc: query.loc,
       userInfo: query.userInfo,
     };
-    if (type === 999) {
+    if (type === ReportType.SdkError) {
       item = Object.assign(item, {msg: query.msg, name: query.name, stack: query.stack, sdkVersion: query.version});
     }
     return item;
