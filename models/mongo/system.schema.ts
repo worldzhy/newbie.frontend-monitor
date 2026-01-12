@@ -4,6 +4,7 @@ import {Document} from 'mongoose';
 @Schema()
 export class System {
   @Prop() systemDomain: string; // System domain
+  @Prop() projectId: string;
   @Prop() systemName: string; // System name
   @Prop() appId: string; // App ID
   @Prop({default: 'web'}) type: string; // App type: web / wx

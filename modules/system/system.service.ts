@@ -12,10 +12,11 @@ export class SystemService {
 
   async saveSystemData(body: any) {
     const type = body.type;
+    if (!body.projectId) return func.errResult({desc: '新增系统必须属于某个项目'});
     if (!body.systemDomain && type === 'web') return func.errResult({desc: '新增系统信息操作：系统域名不能为空'});
     if (!body.appId && type === 'wx') return func.errResult({desc: '新增系统信息操作：appId不能为空'});
     if (!body.systemName) return func.errResult({desc: '新增系统信息操作：系统名称不能为空'});
-
+    
     if (type === 'web') {
       const search = await this.mongo.System().findOne({systemDomain: body.systemDomain}).exec();
       if (search && search.systemDomain) return func.errResult({desc: '新增系统信息操作：系统已存在'});
@@ -31,6 +32,7 @@ export class SystemService {
     const appId = body.appId ? body.appId : func.randomString();
     const SystemModel = this.mongo.System();
     const system = new SystemModel();
+    system.projectId = body.projectId;
     system.systemDomain = body.systemDomain;
     system.systemName = body.systemName;
     system.type = body.type;
@@ -95,11 +97,12 @@ export class SystemService {
   }
 
   async getSysForUserId(query: any) {
-    const {isWarning, systemName, type} = query;
+    const {isWarning, systemName, type, projectId} = query;
     const param: any = {};
     if (isWarning) param.isWarning = parseInt(isWarning);
     if (systemName) param.systemName = new RegExp(systemName);
     if (type) param.type = type;
+    if (projectId) param.projectId = projectId;
     return (await this.mongo.System().find(param).exec()) || [];
   }
 
