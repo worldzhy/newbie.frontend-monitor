@@ -54,8 +54,8 @@
     "FRONTEND_MONITOR_TENCENT_MAP_KEY": ""
   },
   "dependencies": {
-    "@nestjs/mongoose": "^10.0.1",
-    "@nestjs/schedule": "^3.0.1",
+    "@nestjs/mongoose": "latest",
+    "@nestjs/schedule": "latest",
     "clickhouse-orm": "^3.0.0-alpha5",
     "cron": "^2.4.4",
     "cron-parser": "^4.6.0",
