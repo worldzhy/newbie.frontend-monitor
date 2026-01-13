@@ -57,7 +57,7 @@ export class SystemController {
   }
 
   @Post('/deleteSystem')
-  async deleteSystem(@Body() body: any) {
+  async deleteSystem(@Body() body: any): Promise<any> {
     const appId = body.appId;
     const type = body.type;
     if (!appId) throw new Error('删除某个系统：appId不能为空');

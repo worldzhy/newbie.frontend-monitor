@@ -143,7 +143,7 @@ export class SystemService {
       .exec();
   }
 
-  async deleteSystem(appId: string, type: string) {
+  async deleteSystem(appId: string, type: string): Promise<any> {
     return this.mongo.System().deleteOne({appId: appId, type}).exec();
   }
 
