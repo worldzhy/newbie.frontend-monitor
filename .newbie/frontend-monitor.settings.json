@@ -57,7 +57,6 @@
     "@nestjs/mongoose": "latest",
     "@nestjs/schedule": "latest",
     "clickhouse-orm": "^3.0.0-alpha5",
-    "cron": "^4.0.0",
     "cron-parser": "^4.6.0",
     "dotenv": "^16.4.5",
     "ioredis": "^5.4.1",
