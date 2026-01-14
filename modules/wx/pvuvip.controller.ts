@@ -3,7 +3,7 @@ import {ConfigService} from '@nestjs/config';
 import {func} from '../../shared/utils';
 import {WxPvuvipService} from './services/pvuvip.service';
 import {DayReportNumService} from '../../modules/day-report/day-report-num.service';
-import * as parser from 'cron-parser';
+import parser from 'cron-parser';
 
 @Controller('/api/v1/wx/pvuvip')
 export class WxPvuvipController {

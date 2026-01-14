@@ -3,7 +3,7 @@ import {ConfigService} from '@nestjs/config';
 import {DayReportNumService} from '../../modules/day-report/day-report-num.service';
 import {func} from '../../shared/utils';
 import {PvuvipService} from './services/pvuvip.service';
-import * as parser from 'cron-parser';
+import parser from 'cron-parser';
 
 @Controller('/api/v1/pvuvip')
 export class PvuvipController {

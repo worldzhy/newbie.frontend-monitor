@@ -5,7 +5,7 @@ import {SystemService} from '../../../modules/system/system.service';
 import {ClickhouseService} from '../../../models/clickhouse/clickhouse.service';
 import {MongoModelsService} from '../../../models/mongo/mongo.service';
 import {func} from '../../../shared/utils';
-import * as UAParser from 'ua-parser-js';
+import UAParser from 'ua-parser-js';
 import {RedisKeys, ReportType} from '../../../models/enum';
 
 @Injectable()
@@ -43,7 +43,8 @@ export class WebReportTaskService {
     const system = await this.system.getSystemForAppId(item.appId);
     if (!system || system.isUse !== 0) return;
     // TODO querytype === 'PagePerf'
-    if (system.isStatisiPages === 0 && querytype === ReportType.PagePerf) await this.savePages(item, system.slowPageTime);
+    if (system.isStatisiPages === 0 && querytype === ReportType.PagePerf)
+      await this.savePages(item, system.slowPageTime);
     if (system.isStatisiResource === 0 || system.isStatisiAjax === 0) this.forEachResources(item, system, appAjaxs);
     if (system.isStatisiError === 0) await this.collectErrors(item, appErrors);
     if (system.isStatisiSystem === 0 && querytype === ReportType.PagePerf) await this.saveEnvironment(item);

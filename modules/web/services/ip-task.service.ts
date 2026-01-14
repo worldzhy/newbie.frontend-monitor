@@ -4,7 +4,7 @@ import {MongoModelsService} from '../../../models/mongo/mongo.service';
 import {RedisService} from '../../../models/redis/redis.service';
 import {SystemService} from '../../../modules/system/system.service';
 import {func} from '../../../shared/utils';
-import * as https from 'https';
+import https from 'https';
 import {RedisKeyPrefix} from '../../../models/enum';
 
 @Injectable()

@@ -14,7 +14,7 @@ import {WebIpTaskService} from '../../modules/web/services/ip-task.service';
 import {WxReportTaskService} from '../../modules/wx/services/report-task.service';
 import {WxPvuvipTaskService} from '../../modules/wx/services/pvuvip-task.service';
 import {WxIpTaskService} from '../../modules/wx/services/ip-task.service';
-import * as ip from 'ip';
+import ip from 'ip';
 
 @Injectable()
 export class JobsService implements OnModuleInit {

@@ -2,7 +2,7 @@ import {Injectable} from '@nestjs/common';
 import {MongoModelsService} from '../../models/mongo/mongo.service';
 import {RedisService} from '../../models/redis/redis.service';
 import {ConfigService} from '@nestjs/config';
-import * as moment from 'moment';
+import moment from 'moment';
 import {func} from '../../shared/utils';
 import {RedisKeyPrefix} from '../../models/enum';
 

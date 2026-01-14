@@ -1,35 +1,31 @@
-import { Injectable } from '@nestjs/common';
-import * as moment from 'moment';
-import { MongoModelsService } from '../../models/mongo/mongo.service';
-import { ClickhouseService } from '../../models/clickhouse/clickhouse.service';
+import {Injectable} from '@nestjs/common';
+import moment from 'moment';
+import {MongoModelsService} from '../../models/mongo/mongo.service';
+import {ClickhouseService} from '../../models/clickhouse/clickhouse.service';
 
 @Injectable()
 export class RemoveService {
   constructor(
     private readonly mongo: MongoModelsService,
-    private readonly clickhouse: ClickhouseService,
+    private readonly clickhouse: ClickhouseService
   ) {}
 
   async customDelete(fil: any) {
-    const { appId, type = '', resource = [], time = [] } = fil;
+    const {appId, type = '', resource = [], time = []} = fil;
     const query: any = {};
     let result: any = null;
     if (!time.length) {
       throw new Error('必须选择时间');
     }
-    const startTime = moment(new Date(time[0]).valueOf()).format(
-      'YYYY-MM-DD 00:00:00',
-    );
-    const endTime = moment(new Date(time[1]).valueOf()).format(
-      'YYYY-MM-DD 23:59:59',
-    );
+    const startTime = moment(new Date(time[0]).valueOf()).format('YYYY-MM-DD 00:00:00');
+    const endTime = moment(new Date(time[1]).valueOf()).format('YYYY-MM-DD 23:59:59');
     // Use createTime for Mongo queries (camelCase in new schema)
-    query.createTime = { $lte: new Date(endTime), $gte: new Date(startTime) };
+    query.createTime = {$lte: new Date(endTime), $gte: new Date(startTime)};
 
     if (type === 'wx') {
       if (resource && resource.length > 0) {
         // wx自定义数据
-        const arr:any = [];
+        const arr: any = [];
         for (const item of resource) {
           switch (item) {
             case 'ajax': {
@@ -38,15 +34,13 @@ export class RemoveService {
                 Promise.resolve(
                   ajaxModel.delete({
                     where: `createTime<=toDateTime('${endTime}') and createTime>=toDateTime('${startTime}')`,
-                  }),
-                ),
+                  })
+                )
               );
               break;
             }
             case 'page': {
-              arr.push(
-                Promise.resolve(this.mongo.WxPage(appId).deleteMany(query).exec()),
-              );
+              arr.push(Promise.resolve(this.mongo.WxPage(appId).deleteMany(query).exec()));
               break;
             }
             case 'err': {
@@ -55,8 +49,8 @@ export class RemoveService {
                 Promise.resolve(
                   errorModel.delete({
                     where: `createTime<=toDateTime('${endTime}') and createTime>=toDateTime('${startTime}')`,
-                  }),
-                ),
+                  })
+                )
               );
               break;
             }
@@ -66,8 +60,8 @@ export class RemoveService {
                 Promise.resolve(
                   eventModel.delete({
                     where: `createTime<=toDateTime('${endTime}') and createTime>=toDateTime('${startTime}')`,
-                  }),
-                ),
+                  })
+                )
               );
               break;
             }
@@ -77,7 +71,7 @@ export class RemoveService {
       }
     } else if (type === 'web') {
       if (resource && resource.length > 0) {
-        const arr:any = [];
+        const arr: any = [];
         for (const item of resource) {
           // todo 因clickhouse改造，需要重构
           switch (item) {
@@ -87,23 +81,17 @@ export class RemoveService {
                 Promise.resolve(
                   ajaxModel.delete({
                     where: `createTime<=toDateTime('${endTime}') and createTime>=toDateTime('${startTime}')`,
-                  }),
-                ),
+                  })
+                )
               );
               break;
             }
             case 'page': {
-              arr.push(
-                Promise.resolve(this.mongo.WebPage(appId).deleteMany(query).exec()),
-              );
+              arr.push(Promise.resolve(this.mongo.WebPage(appId).deleteMany(query).exec()));
               break;
             }
             case 'env': {
-              arr.push(
-                Promise.resolve(
-                  this.mongo.WebEnvironment(appId).deleteMany(query).exec(),
-                ),
-              );
+              arr.push(Promise.resolve(this.mongo.WebEnvironment(appId).deleteMany(query).exec()));
               break;
             }
             case 'err': {
@@ -112,17 +100,13 @@ export class RemoveService {
                 Promise.resolve(
                   errorModel.delete({
                     where: `createTime<=toDateTime('${endTime}') and createTime>=toDateTime('${startTime}')`,
-                  }),
-                ),
+                  })
+                )
               );
               break;
             }
             case 'resource': {
-              arr.push(
-                Promise.resolve(
-                  this.mongo.WebResource(appId).deleteMany(query).exec(),
-                ),
-              );
+              arr.push(Promise.resolve(this.mongo.WebResource(appId).deleteMany(query).exec()));
             }
           }
         }
