@@ -56,14 +56,14 @@
   "dependencies": {
     "@nestjs/mongoose": "latest",
     "@nestjs/schedule": "latest",
-    "clickhouse-orm": "^3.0.0-alpha5",
-    "cron-parser": "^4.6.0",
-    "dotenv": "^16.4.5",
-    "ioredis": "^5.4.1",
-    "ip": "^2.0.1",
-    "mongoose": "^7.6.3",
-    "nodemailer": "^6.9.13",
-    "ua-parser-js": "^1.0.36"
+    "clickhouse-orm": "latest",
+    "cron-parser": "4.x",
+    "dotenv": "latest",
+    "ioredis": "latest",
+    "ip": "latest",
+    "mongoose": "7.x",
+    "nodemailer": "latest",
+    "ua-parser-js": "1.x"
   },
   "devDependencies": {}
 }
