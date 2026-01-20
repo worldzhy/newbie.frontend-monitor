@@ -25,7 +25,7 @@ export class ClickhouseService implements OnModuleInit {
   constructor(private readonly configService: ConfigService) {}
 
   async onModuleInit() {
-    const raw = this.configService.get('app.clickhouse');
+    const raw = this.configService.get('microservices.frontend-monitor.clickhouse');
     const cfg = (() => {
       if (typeof raw === 'string') {
         const [ch_host, ch_port, ch_username, ch_password, ch_db, ch_cluster] = raw.split(':');
