@@ -5,7 +5,7 @@ import {SystemService} from '../../../modules/system/system.service';
 import {ClickhouseService} from '../../../models/clickhouse/clickhouse.service';
 import {MongoModelsService} from '../../../models/mongo/mongo.service';
 import {func} from '../../../shared/utils';
-import UAParser from 'ua-parser-js';
+import {UAParser} from 'ua-parser-js';
 import {RedisKeys, ReportType} from '../../../models/enum';
 
 @Injectable()

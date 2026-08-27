@@ -46,11 +46,9 @@
     }
   },
   "env": {
-    "FRONTEND_MONITOR_ADMIN_WHITE_LIST": "",
-    "FRONTEND_MONITOR_APP_PORT": "",
-    "FRONTEND_MONITOR_MONGO_URL": "",
-    "FRONTEND_MONITOR_CLICKHOUSE": "",
-    "FRONTEND_MONITOR_REDIS": "",
+    "FRONTEND_MONITOR_CLICKHOUSE": "http://localhost:8123:default::web_monitor:",
+    "FRONTEND_MONITOR_MONGO_URL": "mongodb://127.0.0.1:27017/web-monitor",
+    "FRONTEND_MONITOR_REDIS": "127.0.0.1:6379::1",
     "FRONTEND_MONITOR_TENCENT_MAP_KEY": ""
   },
   "dependencies": {
@@ -63,7 +61,7 @@
     "ip": "latest",
     "mongoose": "7.x",
     "nodemailer": "latest",
-    "ua-parser-js": "1.x"
+    "ua-parser-js": "latest"
   },
   "devDependencies": {}
 }
