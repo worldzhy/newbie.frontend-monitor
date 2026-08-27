@@ -2,8 +2,6 @@
   "config-service": {
     "frontend-monitor": {
       "isLocalDev": false,
-      "adminWhiteList": "process.env.FRONTEND_MONITOR_ADMIN_WHITE_LIST ||'http://localhost:3011,http://localhost:8080'",
-      "port": "Number(process.env.FRONTEND_MONITOR_APP_PORT || 7002)",
       "clickhouse": "process.env.FRONTEND_MONITOR_CLICKHOUSE ||'localhost:8123:default::web_monitor:'",
       "mongoose": {
         "uri": "process.env.FRONTEND_MONITOR_MONGO_URL|| 'mongodb://127.0.0.1:27017/web-monitor'"
