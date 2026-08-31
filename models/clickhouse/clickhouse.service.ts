@@ -25,20 +25,21 @@ export class ClickhouseService implements OnModuleInit {
   constructor(private readonly configService: ConfigService) {}
 
   async onModuleInit() {
-    const config = this.configService.getOrThrow<{
+    const clickhouseConfig = this.configService.getOrThrow<{
       url: string;
       username: string;
       password: string;
       database: string;
     }>('microservices.clickhouse');
+    const clickhouseDB = this.configService.get<string>('microservices.frontend-monitor.clickhouseDB');
 
     const cfg = (() => {
       return {
-        url: config.url.split(':')[0] + ':' + config.url.split(':')[1],
-        port: config.url.split(':')[2],
-        username: config.username,
-        password: config.password,
-        db: config.database,
+        url: clickhouseConfig.url.split(':')[0] + ':' + clickhouseConfig.url.split(':')[1],
+        port: clickhouseConfig.url.split(':')[2],
+        username: clickhouseConfig.username,
+        password: clickhouseConfig.password,
+        db: clickhouseDB || clickhouseConfig.database,
         debug: false,
         cluster: undefined,
       };
