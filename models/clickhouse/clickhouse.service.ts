@@ -25,41 +25,30 @@ export class ClickhouseService implements OnModuleInit {
   constructor(private readonly configService: ConfigService) {}
 
   async onModuleInit() {
-    const raw = this.configService.get('microservices.frontend-monitor.clickhouse');
+    const config = this.configService.getOrThrow<{
+      url: string;
+      username: string;
+      password: string;
+      database: string;
+    }>('microservices.clickhouse');
+
     const cfg = (() => {
-      if (typeof raw === 'string') {
-        const [ch_host, ch_port, ch_username, ch_password, ch_db, ch_cluster] = raw.split(':');
-        const url = (ch_host || 'localhost').startsWith('http')
-          ? ch_host || 'localhost'
-          : `http://${ch_host || 'localhost'}`;
-        return {
-          url,
-          port: ch_port ? Number(ch_port) : 8123,
-          db: ch_db || 'web_monitor',
-          username: ch_username || 'default',
-          password: ch_password || '',
-          debug: false,
-          cluster: ch_cluster || false,
-        };
-      }
-      return (
-        raw || {
-          url: 'http://localhost',
-          port: 8123,
-          db: 'web_monitor',
-          username: 'default',
-          password: '',
-          debug: false,
-          cluster: false,
-        }
-      );
+      return {
+        url: config.url.split(':')[0] + ':' + config.url.split(':')[1],
+        port: config.url.split(':')[2],
+        username: config.username,
+        password: config.password,
+        db: config.database,
+        debug: false,
+        cluster: undefined,
+      };
     })();
     const basicAuth = {
       username: cfg.username || 'default',
       password: cfg.password || '',
     };
     const chOrm = ClickhouseOrm({
-      db: {name: cfg.db, cluster: cfg.cluster || false},
+      db: {name: cfg.db, cluster: cfg.cluster},
       debug: cfg.debug || false,
       client: {
         url: cfg.url || 'http://localhost',

@@ -2,7 +2,6 @@
   "config-service": {
     "frontend-monitor": {
       "isLocalDev": false,
-      "clickhouse": "process.env.FRONTEND_MONITOR_CLICKHOUSE ||'localhost:8123:default::web_monitor:'",
       "mongoose": {
         "uri": "process.env.FRONTEND_MONITOR_MONGO_URL|| 'mongodb://127.0.0.1:27017/web-monitor'"
       },
@@ -44,7 +43,6 @@
     }
   },
   "env": {
-    "FRONTEND_MONITOR_CLICKHOUSE": "http://localhost:8123:default::web_monitor:",
     "FRONTEND_MONITOR_MONGO_URL": "mongodb://127.0.0.1:27017/web-monitor",
     "FRONTEND_MONITOR_REDIS": "127.0.0.1:6379::1",
     "FRONTEND_MONITOR_TENCENT_MAP_KEY": ""
