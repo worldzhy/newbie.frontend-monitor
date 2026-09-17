@@ -1,12 +1,21 @@
 import {Controller, Get, Query} from '@nestjs/common';
+import {ApiOperation, ApiResponse, ApiTags} from '@nestjs/swagger';
 import {func} from '../../shared/utils';
 import {WxAjaxService} from './services/ajax.service';
+import {
+  FrontendMonitorAjaxAverageListResponseDto,
+  FrontendMonitorAjaxMarkUserListResponseDto,
+  FrontendMonitorAjaxOneListResponseDto,
+} from '../web/ajax.dto';
 
+@ApiTags('Frontend Monitor / Wx / Ajax')
 @Controller('/api/v1/wx/ajax')
 export class WxAjaxController {
   constructor(private readonly wxAjax: WxAjaxService) {}
 
   @Get('/getPageAjaxsAvg')
+  @ApiOperation({summary: 'Get page ajax average performance'})
+  @ApiResponse({type: FrontendMonitorAjaxAverageListResponseDto})
   async getPageAjaxsAvg(@Query() q: any) {
     const {appId, url, beginTime, endTime} = q;
     if (!appId) throw new Error('页面ajax信息：appId不能为空');
@@ -16,6 +25,8 @@ export class WxAjaxController {
   }
 
   @Get('/getAverageAjaxList')
+  @ApiOperation({summary: 'Get average ajax performance list'})
+  @ApiResponse({type: FrontendMonitorAjaxAverageListResponseDto})
   async getAverageAjaxList(@Query() q: any) {
     const {appId} = q;
     if (!appId) throw new Error('平均AJAX性能列表：appId不能为空');
@@ -24,6 +35,8 @@ export class WxAjaxController {
   }
 
   @Get('/getOneAjaxList')
+  @ApiOperation({summary: 'Get single ajax average performance data'})
+  @ApiResponse({type: FrontendMonitorAjaxOneListResponseDto})
   async getOneAjaxList(@Query() q: any) {
     const {appId, url, pageNo = 1, pageSize = 15, beginTime, endTime, type} = q;
     if (!appId) throw new Error('单个AJAX平均性能数据：appId不能为空');
@@ -41,6 +54,8 @@ export class WxAjaxController {
   }
 
   @Get('/getMarkUserAjaxList')
+  @ApiOperation({summary: 'Get marked user ajax list'})
+  @ApiResponse({type: FrontendMonitorAjaxMarkUserListResponseDto})
   async getMarkUserAjaxList(@Query() q: any) {
     const {markUser, appId, beginTime, endTime} = q;
     if (!markUser) throw new Error('markUser不能为空');

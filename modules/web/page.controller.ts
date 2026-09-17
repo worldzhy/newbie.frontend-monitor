@@ -1,12 +1,22 @@
 import {Controller, Get, Query} from '@nestjs/common';
+import {ApiOperation, ApiResponse, ApiTags} from '@nestjs/swagger';
 import {func} from '../../shared/utils';
 import {PageService} from './services/page.service';
+import {
+  FrontendMonitorPageAverageListResponseDto,
+  FrontendMonitorPageDetailResponseDto,
+  FrontendMonitorPageVisitListResponseDto,
+  FrontendMonitorRealTimePageItemResponseDto,
+} from './page.dto';
 
+@ApiTags('Frontend Monitor / Web / Pages')
 @Controller('/api/v1/pages')
 export class PageController {
   constructor(private readonly pageSrv: PageService) {}
 
   @Get('/getAveragePageList')
+  @ApiOperation({summary: 'Get average page performance list'})
+  @ApiResponse({type: FrontendMonitorPageAverageListResponseDto})
   async getAveragePageList(@Query() q: any) {
     const {appId} = q;
     if (!appId) throw new Error('平均页面性能列表：appId不能为空');
@@ -15,6 +25,8 @@ export class PageController {
   }
 
   @Get('/getRealTimeAveragePageList')
+  @ApiOperation({summary: 'Get real-time average page performance list'})
+  @ApiResponse({type: FrontendMonitorRealTimePageItemResponseDto, isArray: true})
   async getRealTimeAveragePageList(@Query() q: any) {
     const {appId} = q;
     if (!appId) throw new Error('实时平均页面性能列表：appId不能为空');
@@ -27,6 +39,8 @@ export class PageController {
   }
 
   @Get('/getOnePageList')
+  @ApiOperation({summary: 'Get single page performance or visit list'})
+  @ApiResponse({type: FrontendMonitorPageVisitListResponseDto})
   async getOnePageList(@Query() q: any) {
     const {appId, url} = q;
     if (!appId) throw new Error('单个页面性能或访问列表：appId不能为空');
@@ -36,6 +50,8 @@ export class PageController {
   }
 
   @Get('/getPageDetails')
+  @ApiOperation({summary: 'Get single page details'})
+  @ApiResponse({type: FrontendMonitorPageDetailResponseDto})
   async getPageDetails(@Query() q: any) {
     const {appId, id} = q;
     if (!id) throw new Error('单个页面详情：id不能为空');

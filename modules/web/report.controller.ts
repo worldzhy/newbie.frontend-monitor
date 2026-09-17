@@ -1,4 +1,5 @@
 import {Controller, Post, Req, Headers, Body} from '@nestjs/common';
+import {ApiOperation, ApiResponse, ApiTags} from '@nestjs/swagger';
 import {Request} from 'express';
 import {SystemService} from '../../modules/system/system.service';
 import {ConfigService} from '@nestjs/config';
@@ -7,6 +8,7 @@ import {DayReportNumService} from '../../modules/day-report/day-report-num.servi
 import {RedisService} from '../../models/redis/redis.service';
 import {RedisKeys} from '../../models/enum';
 
+@ApiTags('Frontend Monitor / Web / Report')
 @Controller('/api/v1')
 export class WebReportController {
   private config: any;
@@ -21,6 +23,8 @@ export class WebReportController {
   }
 
   @Post('/report/web')
+  @ApiOperation({summary: 'Web SDK data report endpoint'})
+  @ApiResponse({type: String})
   async webReport(@Req() req: Request, @Headers() headers: Record<string, string | undefined>, @Body() body: any) {
     let query: any = body;
 

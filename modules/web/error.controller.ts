@@ -1,12 +1,21 @@
 import {Controller, Get, Query} from '@nestjs/common';
+import {ApiOperation, ApiResponse, ApiTags} from '@nestjs/swagger';
 import {func} from '../../shared/utils';
 import {ErrorService} from './services/error.service';
+import {
+  FrontendMonitorErrorListResponseDto,
+  FrontendMonitorErrorMarkUserListResponseDto,
+  FrontendMonitorErrorOneListResponseDto,
+} from './error.dto';
 
+@ApiTags('Frontend Monitor / Web / Error')
 @Controller('/api/v1/error')
 export class ErrorController {
   constructor(private readonly errorSrv: ErrorService) {}
 
   @Get('/getAverageErrorList')
+  @ApiOperation({summary: 'Get average error category list'})
+  @ApiResponse({type: FrontendMonitorErrorListResponseDto})
   async getAverageErrorList(@Query() q: any) {
     const {appId} = q;
     if (!appId) throw new Error('获得error分类列表：appId不能为空');
@@ -15,6 +24,8 @@ export class ErrorController {
   }
 
   @Get('/getOneErrorList')
+  @ApiOperation({summary: 'Get single error resource list'})
+  @ApiResponse({type: FrontendMonitorErrorOneListResponseDto})
   async getOneErrorList(@Query() q: any) {
     const {appId, url} = q;
     if (!appId) throw new Error('获得单个ERROR资源列表信息：appId不能为空');
@@ -24,6 +35,8 @@ export class ErrorController {
   }
 
   @Get('/getMarkUserErrorList')
+  @ApiOperation({summary: 'Get marked user error list'})
+  @ApiResponse({type: FrontendMonitorErrorMarkUserListResponseDto})
   async getMarkUserErrorList(@Query() q: any) {
     const {appId, markUser, beginTime, endTime} = q;
     if (!markUser) throw new Error('markUser不能为空');

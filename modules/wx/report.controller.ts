@@ -1,4 +1,5 @@
 import {Controller, Post, Headers, Body} from '@nestjs/common';
+import {ApiOperation, ApiResponse, ApiTags} from '@nestjs/swagger';
 import {SystemService} from '../../modules/system/system.service';
 import {ConfigService} from '@nestjs/config';
 import {RedisService} from '../../models/redis/redis.service';
@@ -6,6 +7,7 @@ import {DayReportNumService} from '../../modules/day-report/day-report-num.servi
 import {func, getRandomIp} from '../../shared/utils';
 import {RedisKeys} from '../../models/enum';
 
+@ApiTags('Frontend Monitor / Wx / Report')
 @Controller('/api/v1/wx')
 export class WxReportController {
   private config: any;
@@ -19,6 +21,8 @@ export class WxReportController {
   }
 
   @Post('/report/wx')
+  @ApiOperation({summary: 'Wx SDK data report endpoint'})
+  @ApiResponse({type: String})
   async wxReport(@Headers() headers: Record<string, string | undefined>, @Body() body: any) {
     let query: any = body;
     if (headers['content-type'] && headers['content-type'].includes('text/plain')) {

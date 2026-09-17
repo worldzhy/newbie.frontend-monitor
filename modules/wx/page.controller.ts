@@ -1,12 +1,22 @@
 import {Controller, Get, Query} from '@nestjs/common';
+import {ApiOperation, ApiResponse, ApiTags} from '@nestjs/swagger';
 import {func} from '../../shared/utils';
 import {WxPageService} from './services/page.service';
+import {
+  FrontendMonitorWxPageAverageListResponseDto,
+  FrontendMonitorWxPageCountItemResponseDto,
+  FrontendMonitorWxPageDetailResponseDto,
+  FrontendMonitorWxPageVisitListResponseDto,
+} from './page.dto';
 
+@ApiTags('Frontend Monitor / Wx / Pages')
 @Controller('/api/v1/wx/pages')
 export class WxPageController {
   constructor(private readonly wxPage: WxPageService) {}
 
   @Get('/getAveragePageList')
+  @ApiOperation({summary: 'Get average page performance list'})
+  @ApiResponse({type: FrontendMonitorWxPageAverageListResponseDto})
   async getAveragePageList(@Query() q: any) {
     const {appId} = q;
     if (!appId) throw new Error('平均页面性能列表：appId不能为空');
@@ -15,6 +25,8 @@ export class WxPageController {
   }
 
   @Get('/getOnePageList')
+  @ApiOperation({summary: 'Get single page performance list'})
+  @ApiResponse({type: FrontendMonitorWxPageVisitListResponseDto})
   async getOnePageList(@Query() q: any) {
     const {appId, url} = q;
     if (!appId) throw new Error('单个页面性能列表：appId不能为空');
@@ -24,6 +36,8 @@ export class WxPageController {
   }
 
   @Get('/getPageDetails')
+  @ApiOperation({summary: 'Get single page details'})
+  @ApiResponse({type: FrontendMonitorWxPageDetailResponseDto})
   async getPageDetails(@Query() q: any) {
     const {appId, id} = q;
     if (!appId) throw new Error('单个页面详情：appId不能为空');
@@ -33,6 +47,8 @@ export class WxPageController {
   }
 
   @Get('/getDataGroupBy')
+  @ApiOperation({summary: 'Get page data grouped by type'})
+  @ApiResponse({type: FrontendMonitorWxPageCountItemResponseDto, isArray: true})
   async getDataGroupBy(@Query() q: any) {
     const {appId, beginTime, endTime, type = 1, url} = q;
     if (!appId) throw new Error('页面性能列表：appId不能为空');
@@ -42,6 +58,8 @@ export class WxPageController {
   }
 
   @Get('/getPageForMarkpage')
+  @ApiOperation({summary: 'Get page details by markPage or markUser'})
+  @ApiResponse({type: FrontendMonitorWxPageDetailResponseDto})
   async getPageForMarkpage(@Query() q: any) {
     const {appId, markPage, markUser} = q;
     if (!appId) throw new Error('单个页面详情：appId不能为空');

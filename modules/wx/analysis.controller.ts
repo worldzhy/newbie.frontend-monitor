@@ -1,12 +1,22 @@
 import {Controller, Get, Query} from '@nestjs/common';
+import {ApiOperation, ApiResponse, ApiTags} from '@nestjs/swagger';
 import {func} from '../../shared/utils';
 import {WxAnalysisService} from './services/analysis.service';
+import {
+  FrontendMonitorAnalysisUserListResponseDto,
+  FrontendMonitorProvinceCountResponseDto,
+  FrontendMonitorWxTopDatasResponseDto,
+} from '../web/analysis.dto';
+import {FrontendMonitorWxPageDetailResponseDto} from './page.dto';
 
+@ApiTags('Frontend Monitor / Wx / Analysis')
 @Controller('/api/v1/wx/analysis')
 export class WxAnalysisController {
   constructor(private readonly wxAnalysis: WxAnalysisService) {}
 
   @Get('/getAnalysislist')
+  @ApiOperation({summary: 'Get user funnel analysis list'})
+  @ApiResponse({type: FrontendMonitorAnalysisUserListResponseDto})
   async getAnalysislist(@Query() q: any) {
     const {appId, beginTime, endTime, uid, phone} = q;
     if (!appId) throw new Error('用户漏斗分析列表：appId不能为空');
@@ -15,6 +25,8 @@ export class WxAnalysisController {
   }
 
   @Get('/getAnalysisOneList')
+  @ApiOperation({summary: 'Get single user behavior track list'})
+  @ApiResponse({type: FrontendMonitorWxPageDetailResponseDto, isArray: true})
   async getAnalysisOneList(@Query() q: any) {
     const {appId, markUser} = q;
     if (!appId) throw new Error('单个用户行为轨迹列表：appId不能为空');
@@ -29,6 +41,8 @@ export class WxAnalysisController {
   }
 
   @Get('/getTopDatas')
+  @ApiOperation({summary: 'Get top page data statistics'})
+  @ApiResponse({type: FrontendMonitorWxTopDatasResponseDto})
   async getTopDatas(@Query() q: any) {
     const {appId, beginTime, endTime} = q;
     if (!appId) throw new Error('top页面：appId不能为空');
@@ -37,6 +51,8 @@ export class WxAnalysisController {
   }
 
   @Get('/getProvinceCount')
+  @ApiOperation({summary: 'Get province count statistics'})
+  @ApiResponse({type: FrontendMonitorProvinceCountResponseDto})
   async getProvinceCount(@Query() q: any) {
     const {appId, beginTime, endTime} = q;
     if (!appId) throw new Error('appId不能为空');

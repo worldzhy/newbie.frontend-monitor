@@ -1,10 +1,13 @@
 import {Controller, Get, Query} from '@nestjs/common';
+import {ApiOperation, ApiResponse, ApiTags} from '@nestjs/swagger';
 import {ConfigService} from '@nestjs/config';
 import {DayReportNumService} from '../../modules/day-report/day-report-num.service';
 import {func} from '../../shared/utils';
 import {PvuvipService} from './services/pvuvip.service';
+import {FrontendMonitorPvUvIpResponseDto} from './pvuvip.dto';
 import parser from 'cron-parser';
 
+@ApiTags('Frontend Monitor / Web / PvUvIp')
 @Controller('/api/v1/pvuvip')
 export class PvuvipController {
   private cfg: any;
@@ -17,6 +20,8 @@ export class PvuvipController {
   }
 
   @Get('/getPvUvIpSurveyToday')
+  @ApiOperation({summary: "Get today's PV/UV/IP survey"})
+  @ApiResponse({type: Object})
   async getPvUvIpSurveyToday(@Query() q: any) {
     const {appId} = q;
     if (!appId) throw new Error('pvuvip概况统计：appId不能为空');
@@ -34,6 +39,8 @@ export class PvuvipController {
   }
 
   @Get('/getPvUvIpSurveyOne')
+  @ApiOperation({summary: 'Get PV/UV/IP survey for a time range'})
+  @ApiResponse({type: FrontendMonitorPvUvIpResponseDto})
   async getPvUvIpSurveyOne(@Query() q: any) {
     const {appId, beginTime, endTime} = q;
     if (!appId) throw new Error('pvuvip概况统计：appId不能为空');
@@ -44,6 +51,8 @@ export class PvuvipController {
   }
 
   @Get('/getHistoryPvUvIplist')
+  @ApiOperation({summary: 'Get history PV/UV/IP list'})
+  @ApiResponse({type: FrontendMonitorPvUvIpResponseDto, isArray: true})
   async getHistoryPvUvIplist(@Query() q: any) {
     const {appId, beginTime, endTime} = q;
     if (!appId) throw new Error('pvuvip获得历史概况：appId不能为空');
@@ -58,6 +67,8 @@ export class PvuvipController {
   }
 
   @Get('/getPvUvIpList')
+  @ApiOperation({summary: 'Get PV/UV/IP data list'})
+  @ApiResponse({type: Object})
   async getPvUvIpList(@Query() q: any) {
     const {appId, beginTime, endTime} = q;
     if (!appId) throw new Error('界面查询pvuvip：appId不能为空');
@@ -72,6 +83,8 @@ export class PvuvipController {
   }
 
   @Get('/getPvUvIpOne')
+  @ApiOperation({summary: 'Get single PV/UV/IP survey'})
+  @ApiResponse({type: Object})
   async getPvUvIpOne(@Query() q: any) {
     const {appId, beginTime, endTime} = q;
     if (!appId) throw new Error('界面查询pvuvip：appId不能为空');
