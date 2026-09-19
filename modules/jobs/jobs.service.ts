@@ -1,4 +1,4 @@
-import {Injectable, OnModuleInit} from '@nestjs/common';
+import {Injectable, Logger, OnModuleInit} from '@nestjs/common';
 import {Cron, SchedulerRegistry} from '@nestjs/schedule';
 import {CronJob} from 'cron';
 import {ConfigService} from '@nestjs/config';
@@ -19,6 +19,7 @@ import ip from 'ip';
 @Injectable()
 export class JobsService implements OnModuleInit {
   private cfg: any;
+  private readonly logger = new Logger(JobsService.name);
 
   constructor(
     private readonly redis: RedisService,
@@ -83,10 +84,20 @@ export class JobsService implements OnModuleInit {
   private async redisLock(redisKey: string, ttl: number) {
     const lock = `${ip.address()}:${this.cfg.port}:${func.randomString(3)}`;
     const res = await this.redis.set(redisKey, lock, 'EX', ttl, 'NX');
-    if (!res) return false;
+    if (!res) {
+      // Lock is held by another instance — normal in multi-instance deployments.
+      // Log at verbose level so it doesn't spam the console every minute.
+      this.logger.verbose(`Lock [${redisKey}] not acquired (held by another instance)`);
+      return false;
+    }
     const dbLock = await this.redis.get(redisKey);
-    if (lock !== dbLock) return false;
-    console.log(`Get [ ${redisKey} ] lock success: ${lock}`);
+    if (lock !== dbLock) {
+      // Lock verification failed — could indicate a race or Redis issue, worth warning.
+      this.logger.warn(`Lock [${redisKey}] verification failed: expected ${lock}, got ${dbLock}`);
+      return false;
+    }
+    // Lock acquired successfully — normal event, log at verbose level to avoid noise.
+    this.logger.verbose(`Lock [${redisKey}] acquired: ${lock}`);
     return true;
   }
 
