@@ -3,7 +3,7 @@ import {ScheduleModule} from '@nestjs/schedule';
 // Shared MongoDB connection module, consumed via the microservices path alias.
 import {MongoModule} from '@microservices/mongo/mongo.module';
 import {RedisModule} from './models/redis/redis.module';
-import {ClickhouseModule} from './models/clickhouse/clickhouse.module';
+import {MonitorClickhouseModule} from './models/clickhouse/monitor-clickhouse.module';
 import {SharedModule} from './shared/shared.module';
 import {SystemModule} from './modules/system/system.module';
 import {JobsModule} from './modules/jobs/jobs.module';
@@ -18,7 +18,7 @@ import {RemoveModule} from './modules/remove/remove.module';
     ScheduleModule.forRoot(),
     MongoModule,
     RedisModule,
-    ClickhouseModule,
+    MonitorClickhouseModule,
     MonitorModelsModule,
     SharedModule,
     SystemModule,

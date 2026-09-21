@@ -11,7 +11,7 @@ import WxEventFactory from './wx/event';
 import WxSdkErrorFactory from './wx/sdk-error';
 
 @Injectable()
-export class ClickhouseService implements OnModuleInit {
+export class MonitorClickhouseService implements OnModuleInit {
   private chOrm: any;
 
   private webAjaxFactory: (appId: string) => Promise<any>;

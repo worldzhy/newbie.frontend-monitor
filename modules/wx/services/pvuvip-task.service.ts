@@ -2,7 +2,7 @@ import {Injectable} from '@nestjs/common';
 import {ConfigService} from '@nestjs/config';
 import {SystemService} from '../../../modules/system/system.service';
 import {MonitorModelsService} from '../../../models/mongo/monitor-models.service';
-import {ClickhouseService} from '../../../models/clickhouse/clickhouse.service';
+import {MonitorClickhouseService} from '../../../models/clickhouse/monitor-clickhouse.service';
 import {func} from '../../../shared/utils';
 
 function cronMinuteInterval(cronExp: string) {
@@ -19,7 +19,7 @@ export class WxPvuvipTaskService {
     private readonly config: ConfigService,
     private readonly system: SystemService,
     private readonly models: MonitorModelsService,
-    private readonly ch: ClickhouseService
+    private readonly ch: MonitorClickhouseService
   ) {
     this.cfg = this.config.get('microservices.frontend-monitor');
   }

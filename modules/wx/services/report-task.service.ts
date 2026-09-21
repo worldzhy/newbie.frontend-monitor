@@ -2,7 +2,7 @@ import {Injectable} from '@nestjs/common';
 import {ConfigService} from '@nestjs/config';
 import {RedisService} from '../../../models/redis/redis.service';
 import {MonitorModelsService} from '../../../models/mongo/monitor-models.service';
-import {ClickhouseService} from '../../../models/clickhouse/clickhouse.service';
+import {MonitorClickhouseService} from '../../../models/clickhouse/monitor-clickhouse.service';
 import {SystemService} from '../../../modules/system/system.service';
 import {func} from '../../../shared/utils';
 import {RedisKeys, ReportType} from '../../../models/enum';
@@ -14,7 +14,7 @@ export class WxReportTaskService {
     private readonly config: ConfigService,
     private readonly redis: RedisService,
     private readonly models: MonitorModelsService,
-    private readonly ch: ClickhouseService,
+    private readonly ch: MonitorClickhouseService,
     private readonly system: SystemService
   ) {
     this.cfg = this.config.get('microservices.frontend-monitor');

@@ -1,12 +1,12 @@
 import {Injectable} from '@nestjs/common';
 import {ConfigService} from '@nestjs/config';
-import {ClickhouseService} from '../../../models/clickhouse/clickhouse.service';
+import {MonitorClickhouseService} from '../../../models/clickhouse/monitor-clickhouse.service';
 
 @Injectable()
 export class AjaxService {
   private cfg: any;
   constructor(
-    private readonly ch: ClickhouseService,
+    private readonly ch: MonitorClickhouseService,
     private readonly config: ConfigService
   ) {
     this.cfg = this.config.get('microservices.frontend-monitor');

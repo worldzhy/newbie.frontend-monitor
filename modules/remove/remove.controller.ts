@@ -1,7 +1,7 @@
-import { Controller, Post, Body } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { RemoveService } from './remove.service';
-import { func } from '../../shared/utils';
+import {Controller, Post, Body} from '@nestjs/common';
+import {ApiOperation, ApiResponse, ApiTags} from '@nestjs/swagger';
+import {RemoveService} from './remove.service';
+import {func} from '../../shared/utils';
 
 @ApiTags('Frontend Monitor / Remove')
 @Controller('/api/v1/remove')

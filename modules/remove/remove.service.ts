@@ -1,13 +1,13 @@
 import {Injectable} from '@nestjs/common';
 import moment from 'moment';
 import {MonitorModelsService} from '../../models/mongo/monitor-models.service';
-import {ClickhouseService} from '../../models/clickhouse/clickhouse.service';
+import {MonitorClickhouseService} from '../../models/clickhouse/monitor-clickhouse.service';
 
 @Injectable()
 export class RemoveService {
   constructor(
     private readonly models: MonitorModelsService,
-    private readonly clickhouse: ClickhouseService
+    private readonly clickhouse: MonitorClickhouseService
   ) {}
 
   async customDelete(fil: any) {

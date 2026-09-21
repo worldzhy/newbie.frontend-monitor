@@ -3,7 +3,7 @@ import {ConfigModule} from '@nestjs/config';
 import {RedisModule} from '../../models/redis/redis.module';
 import {SystemModule} from '../../modules/system/system.module';
 import {DayReportModule} from '../../modules/day-report/day-report.module';
-import {ClickhouseModule} from '../../models/clickhouse/clickhouse.module';
+import {MonitorClickhouseModule} from '../../models/clickhouse/monitor-clickhouse.module';
 import {MonitorModelsModule} from '../../models/mongo/monitor-models.module';
 
 import {WxReportController} from './report.controller';
@@ -27,7 +27,7 @@ import {WxEventService} from './services/event.service';
 import {WxCustomService} from './services/custom.service';
 
 @Module({
-  imports: [ConfigModule, RedisModule, SystemModule, DayReportModule, ClickhouseModule, MonitorModelsModule],
+  imports: [ConfigModule, RedisModule, SystemModule, DayReportModule, MonitorClickhouseModule, MonitorModelsModule],
   controllers: [
     WxReportController,
     WxAjaxController,

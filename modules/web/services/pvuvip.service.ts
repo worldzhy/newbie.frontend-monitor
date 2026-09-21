@@ -1,6 +1,6 @@
 import {Injectable} from '@nestjs/common';
 import {MonitorModelsService} from '../../../models/mongo/monitor-models.service';
-import {ClickhouseService} from '../../../models/clickhouse/clickhouse.service';
+import {MonitorClickhouseService} from '../../../models/clickhouse/monitor-clickhouse.service';
 import {DayReportNumService} from '../../../modules/day-report/day-report-num.service';
 import {func} from '../../../shared/utils';
 
@@ -8,7 +8,7 @@ import {func} from '../../../shared/utils';
 export class PvuvipService {
   constructor(
     private readonly models: MonitorModelsService,
-    private readonly ch: ClickhouseService,
+    private readonly ch: MonitorClickhouseService,
     private readonly dayReportNum: DayReportNumService
   ) {}
 

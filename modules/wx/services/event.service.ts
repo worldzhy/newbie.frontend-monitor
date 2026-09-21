@@ -1,9 +1,9 @@
 import {Injectable} from '@nestjs/common';
-import {ClickhouseService} from '../../../models/clickhouse/clickhouse.service';
+import {MonitorClickhouseService} from '../../../models/clickhouse/monitor-clickhouse.service';
 
 @Injectable()
 export class WxEventService {
-  constructor(private readonly ch: ClickhouseService) {}
+  constructor(private readonly ch: MonitorClickhouseService) {}
 
   async getEventList({
     appId,
