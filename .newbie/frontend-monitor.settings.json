@@ -47,7 +47,6 @@
   },
   "dependencies": {
     "@nestjs/schedule": "latest",
-    "clickhouse-orm": "latest",
     "cron-parser": "4.x",
     "dotenv": "latest",
     "ioredis": "latest",

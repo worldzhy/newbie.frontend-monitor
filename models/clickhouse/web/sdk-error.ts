@@ -1,23 +1,24 @@
-import {DATA_TYPE} from 'clickhouse-orm';
+import {ClickhouseDataType} from '@microservices/clickhouse/clickhouse.types';
+import {ClickhouseService} from '@microservices/clickhouse/clickhouse.service';
 import {ClickHouseTablePrefix} from '../../enum';
 
-export default function WebSdkError(chOrm: any) {
+export default function WebSdkError(clickhouse: ClickhouseService, dbName: string) {
   const schema = {
     tableName: ClickHouseTablePrefix.WEB_SDK_ERROR,
     schema: {
-      createTime: {type: DATA_TYPE.DateTime, default: Date.now}, // Created time
-      appId: {type: DATA_TYPE.String}, // App ID
-      name: {type: DATA_TYPE.String}, // Error name
-      msg: {type: DATA_TYPE.String}, // Error message
-      stack: {type: DATA_TYPE.String}, // Error stack
-      sdkVersion: {type: DATA_TYPE.String}, // SDK version
-      markUser: {type: DATA_TYPE.String}, // User mark
-      phone: {type: DATA_TYPE.String}, // User phone
-      uid: {type: DATA_TYPE.String}, // User ID
-      browser: {type: DATA_TYPE.LowCardinality(DATA_TYPE.String)}, // Browser
-      browserVersion: {type: DATA_TYPE.String}, // Browser version
-      system: {type: DATA_TYPE.LowCardinality(DATA_TYPE.String)}, // System
-      systemVersion: {type: DATA_TYPE.String}, // System version
+      createTime: {type: ClickhouseDataType.DateTime, default: Date.now}, // Created time
+      appId: {type: ClickhouseDataType.String}, // App ID
+      name: {type: ClickhouseDataType.String}, // Error name
+      msg: {type: ClickhouseDataType.String}, // Error message
+      stack: {type: ClickhouseDataType.String}, // Error stack
+      sdkVersion: {type: ClickhouseDataType.String}, // SDK version
+      markUser: {type: ClickhouseDataType.String}, // User mark
+      phone: {type: ClickhouseDataType.String}, // User phone
+      uid: {type: ClickhouseDataType.String}, // User ID
+      browser: {type: ClickhouseDataType.LowCardinality(ClickhouseDataType.String)}, // Browser
+      browserVersion: {type: ClickhouseDataType.String}, // Browser version
+      system: {type: ClickhouseDataType.LowCardinality(ClickhouseDataType.String)}, // System
+      systemVersion: {type: ClickhouseDataType.String}, // System version
     },
     options: `ENGINE = MergeTree
     PARTITION BY toYYYYMM(createTime)
@@ -29,7 +30,7 @@ export default function WebSdkError(chOrm: any) {
   let _model: any = null;
   return async () => {
     if (!_model) {
-      _model = await chOrm.model(schema);
+      _model = await clickhouse.createModel(schema, dbName);
     }
     return _model;
   };

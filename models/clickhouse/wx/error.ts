@@ -1,29 +1,30 @@
-import {DATA_TYPE} from 'clickhouse-orm';
+import {ClickhouseDataType} from '@microservices/clickhouse/clickhouse.types';
+import {ClickhouseService} from '@microservices/clickhouse/clickhouse.service';
 import {ClickHouseTablePrefix} from '../../enum';
 
-export default function WxError(chOrm: any) {
+export default function WxError(clickhouse: ClickhouseService, dbName: string) {
   const schema = {
     tableName: ClickHouseTablePrefix.WX_ERROR,
     schema: {
-      createTime: {type: DATA_TYPE.DateTime, default: Date.now}, // Created time
-      msg: {type: DATA_TYPE.String}, // Error message
-      stack: {type: DATA_TYPE.String}, // Error stack
-      errorType: {type: DATA_TYPE.String}, // JS error type
-      type: {type: DATA_TYPE.LowCardinality(DATA_TYPE.String)}, // Error type
-      status: {type: DATA_TYPE.String}, // HTTP status
-      col: {type: DATA_TYPE.String}, // Column
-      line: {type: DATA_TYPE.String}, // Line
-      query: {type: DATA_TYPE.String}, // HTTP query params
-      options: {type: DATA_TYPE.String}, // POST body params
-      method: {type: DATA_TYPE.LowCardinality(DATA_TYPE.String)}, // Request method
-      fullName: {type: DATA_TYPE.String}, // Full error resource URL
-      name: {type: DATA_TYPE.String}, // Error resource URL
-      path: {type: DATA_TYPE.String}, // Page path
-      markPage: {type: DATA_TYPE.String}, // Page mark
-      markUser: {type: DATA_TYPE.String}, // User mark
-      phone: {type: DATA_TYPE.String}, // User phone
-      uid: {type: DATA_TYPE.String}, // User ID
-      traceId: {type: DATA_TYPE.String}, // Trace ID
+      createTime: {type: ClickhouseDataType.DateTime, default: Date.now}, // Created time
+      msg: {type: ClickhouseDataType.String}, // Error message
+      stack: {type: ClickhouseDataType.String}, // Error stack
+      errorType: {type: ClickhouseDataType.String}, // JS error type
+      type: {type: ClickhouseDataType.LowCardinality(ClickhouseDataType.String)}, // Error type
+      status: {type: ClickhouseDataType.String}, // HTTP status
+      col: {type: ClickhouseDataType.String}, // Column
+      line: {type: ClickhouseDataType.String}, // Line
+      query: {type: ClickhouseDataType.String}, // HTTP query params
+      options: {type: ClickhouseDataType.String}, // POST body params
+      method: {type: ClickhouseDataType.LowCardinality(ClickhouseDataType.String)}, // Request method
+      fullName: {type: ClickhouseDataType.String}, // Full error resource URL
+      name: {type: ClickhouseDataType.String}, // Error resource URL
+      path: {type: ClickhouseDataType.String}, // Page path
+      markPage: {type: ClickhouseDataType.String}, // Page mark
+      markUser: {type: ClickhouseDataType.String}, // User mark
+      phone: {type: ClickhouseDataType.String}, // User phone
+      uid: {type: ClickhouseDataType.String}, // User ID
+      traceId: {type: ClickhouseDataType.String}, // Trace ID
     },
     options: `ENGINE = MergeTree
     PARTITION BY toYYYYMM(createTime)
@@ -37,10 +38,13 @@ export default function WxError(chOrm: any) {
   return async (appId: string) => {
     if (!models[appId]) {
       if (!modelCreates[appId]) {
-        modelCreates[appId] = chOrm.model({
-          ...schema,
-          tableName: schema.tableName + appId,
-        });
+        modelCreates[appId] = clickhouse.createModel(
+          {
+            ...schema,
+            tableName: schema.tableName + appId,
+          },
+          dbName
+        );
       }
       const model = await modelCreates[appId];
       delete modelCreates[appId];

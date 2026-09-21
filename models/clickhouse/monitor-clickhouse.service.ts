@@ -1,6 +1,6 @@
 import {Injectable, OnModuleInit} from '@nestjs/common';
 import {ConfigService} from '@nestjs/config';
-import {ClickhouseOrm} from 'clickhouse-orm';
+import {ClickhouseService} from '@microservices/clickhouse/clickhouse.service';
 
 import WebAjaxFactory from './web/ajax';
 import WebErrorFactory from './web/error';
@@ -12,8 +12,6 @@ import WxSdkErrorFactory from './wx/sdk-error';
 
 @Injectable()
 export class MonitorClickhouseService implements OnModuleInit {
-  private chOrm: any;
-
   private webAjaxFactory: (appId: string) => Promise<any>;
   private webErrorFactory: (appId: string) => Promise<any>;
   private wxAjaxFactory: (appId: string) => Promise<any>;
@@ -22,59 +20,31 @@ export class MonitorClickhouseService implements OnModuleInit {
   private webSdkErrorFactory: () => Promise<any>;
   private wxSdkErrorFactory: () => Promise<any>;
 
-  constructor(private readonly configService: ConfigService) {}
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly clickhouse: ClickhouseService
+  ) {}
 
   async onModuleInit() {
-    const clickhouseConfig = this.configService.getOrThrow<{
-      url: string;
-      username: string;
-      password: string;
-      database: string;
-    }>('microservices.clickhouse');
-    const clickhouseDB = this.configService.get<string>('microservices.frontend-monitor.clickhouseDB');
+    // The shared ClickhouseService owns the @clickhouse/client connection and
+    // exposes the ORM-like helpers (createDatabase / model). The business layer
+    // only needs to select which database to use.
+    const dbName =
+      this.configService.get<string>('microservices.frontend-monitor.clickhouseDB') ||
+      this.configService.getOrThrow<string>('microservices.clickhouse.database');
 
-    const cfg = (() => {
-      return {
-        url: clickhouseConfig.url.split(':')[0] + ':' + clickhouseConfig.url.split(':')[1],
-        port: clickhouseConfig.url.split(':')[2],
-        username: clickhouseConfig.username,
-        password: clickhouseConfig.password,
-        db: clickhouseDB || clickhouseConfig.database,
-        debug: false,
-        cluster: undefined,
-      };
-    })();
-    const basicAuth = {
-      username: cfg.username || 'default',
-      password: cfg.password || '',
-    };
-    const chOrm = ClickhouseOrm({
-      db: {name: cfg.db, cluster: cfg.cluster},
-      debug: cfg.debug || false,
-      client: {
-        url: cfg.url || 'http://localhost',
-        port: cfg.port || 8123,
-        basicAuth,
-        debug: false,
-        isUseGzip: true,
-        format: 'json',
-      },
-    });
-    await chOrm.createDatabase();
-    this.chOrm = chOrm;
+    // Ensure the database exists before creating tables.
+    await this.clickhouse.createDatabase(dbName);
 
-    this.webAjaxFactory = WebAjaxFactory(this.chOrm);
-    this.webErrorFactory = WebErrorFactory(this.chOrm);
-    this.webSdkErrorFactory = WebSdkErrorFactory(this.chOrm);
+    // Initialize table factories with the shared service and database name.
+    this.webAjaxFactory = WebAjaxFactory(this.clickhouse, dbName);
+    this.webErrorFactory = WebErrorFactory(this.clickhouse, dbName);
+    this.webSdkErrorFactory = WebSdkErrorFactory(this.clickhouse, dbName);
 
-    this.wxAjaxFactory = WxAjaxFactory(this.chOrm);
-    this.wxErrorFactory = WxErrorFactory(this.chOrm);
-    this.wxEventFactory = WxEventFactory(this.chOrm);
-    this.wxSdkErrorFactory = WxSdkErrorFactory(this.chOrm);
-  }
-
-  getOrm() {
-    return this.chOrm;
+    this.wxAjaxFactory = WxAjaxFactory(this.clickhouse, dbName);
+    this.wxErrorFactory = WxErrorFactory(this.clickhouse, dbName);
+    this.wxEventFactory = WxEventFactory(this.clickhouse, dbName);
+    this.wxSdkErrorFactory = WxSdkErrorFactory(this.clickhouse, dbName);
   }
 
   async WebAjax(appId: string) {
