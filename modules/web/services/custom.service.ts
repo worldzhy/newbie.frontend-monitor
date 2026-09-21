@@ -1,12 +1,12 @@
 import {Injectable} from '@nestjs/common';
-import {MongoModelsService} from '../../../models/mongo/mongo.service';
+import {MonitorModelsService} from '../../../models/mongo/monitor-models.service';
 
 @Injectable()
 export class WebCustomService {
-  constructor(private readonly mongo: MongoModelsService) {}
+  constructor(private readonly models: MonitorModelsService) {}
 
   async getCustomFilterList(appId: string) {
-    const rows = await this.mongo
+    const rows = await this.models
       .WebCustomFilter(appId)
       .find()
       .sort({createTime: -1})
@@ -19,7 +19,7 @@ export class WebCustomService {
     if (!filterKey) throw new Error('新增过滤条件：filterKey不能为空');
     if (!appId) throw new Error('新增过滤条件：appId不能为空');
     if (!filterDesc) throw new Error('新增过滤条件：filterDesc不能为空');
-    const model = this.mongo.WebCustomFilter(appId);
+    const model = this.models.WebCustomFilter(appId);
     const exists = await model.findOne({filterKey}).exec();
     if (exists && exists.filterKey) throw new Error('新增过滤条件：filterKey已存在');
     const doc = new model();
@@ -33,7 +33,7 @@ export class WebCustomService {
   async delCustomFilter(appId: string, id: string) {
     if (!id) throw new Error('删除过滤条件：_id不能为空');
     if (!appId) throw new Error('删除过滤条件：appId不能为空');
-    const model = this.mongo.WebCustomFilter(appId);
+    const model = this.models.WebCustomFilter(appId);
     try {
       await model.findOne({_id: id}).exec();
     } catch {
@@ -74,7 +74,7 @@ export class WebCustomService {
         }
       });
     }
-    const model = this.mongo.WebCustom(appId);
+    const model = this.models.WebCustom(appId);
     const totalNum = await model.count(filter).read('secondaryPreferred').exec();
     const dataList = await model
       .find(filter)

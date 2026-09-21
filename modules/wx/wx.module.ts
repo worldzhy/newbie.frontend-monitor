@@ -4,7 +4,7 @@ import {RedisModule} from '../../models/redis/redis.module';
 import {SystemModule} from '../../modules/system/system.module';
 import {DayReportModule} from '../../modules/day-report/day-report.module';
 import {ClickhouseModule} from '../../models/clickhouse/clickhouse.module';
-import {MongoModelsModule} from '../../models/mongo/mongo.module';
+import {MonitorModelsModule} from '../../models/mongo/monitor-models.module';
 
 import {WxReportController} from './report.controller';
 import {WxAjaxController} from './ajax.controller';
@@ -27,7 +27,7 @@ import {WxEventService} from './services/event.service';
 import {WxCustomService} from './services/custom.service';
 
 @Module({
-  imports: [ConfigModule, RedisModule, SystemModule, DayReportModule, ClickhouseModule, MongoModelsModule],
+  imports: [ConfigModule, RedisModule, SystemModule, DayReportModule, ClickhouseModule, MonitorModelsModule],
   controllers: [
     WxReportController,
     WxAjaxController,

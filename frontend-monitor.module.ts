@@ -1,12 +1,14 @@
 import {Module} from '@nestjs/common';
 import {ScheduleModule} from '@nestjs/schedule';
+// Shared MongoDB connection module, consumed via the microservices path alias.
+import {MongoModule} from '@microservices/mongo/mongo.module';
 import {RedisModule} from './models/redis/redis.module';
 import {ClickhouseModule} from './models/clickhouse/clickhouse.module';
 import {SharedModule} from './shared/shared.module';
 import {SystemModule} from './modules/system/system.module';
 import {JobsModule} from './modules/jobs/jobs.module';
 import {DayReportModule} from './modules/day-report/day-report.module';
-import {MongoModelsModule} from './models/mongo/mongo.module';
+import {MonitorModelsModule} from './models/mongo/monitor-models.module';
 import {WebModule} from './modules/web/web.module';
 import {WxModule} from './modules/wx/wx.module';
 import {RemoveModule} from './modules/remove/remove.module';
@@ -14,9 +16,10 @@ import {RemoveModule} from './modules/remove/remove.module';
 @Module({
   imports: [
     ScheduleModule.forRoot(),
+    MongoModule,
     RedisModule,
     ClickhouseModule,
-    MongoModelsModule,
+    MonitorModelsModule,
     SharedModule,
     SystemModule,
     DayReportModule,

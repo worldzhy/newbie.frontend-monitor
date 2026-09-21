@@ -1,5 +1,5 @@
 import {Injectable} from '@nestjs/common';
-import {MongoModelsService} from '../../../models/mongo/mongo.service';
+import {MonitorModelsService} from '../../../models/mongo/monitor-models.service';
 import {ClickhouseService} from '../../../models/clickhouse/clickhouse.service';
 import {DayReportNumService} from '../../../modules/day-report/day-report-num.service';
 import {func} from '../../../shared/utils';
@@ -7,7 +7,7 @@ import {func} from '../../../shared/utils';
 @Injectable()
 export class WxPvuvipService {
   constructor(
-    private readonly mongo: MongoModelsService,
+    private readonly models: MonitorModelsService,
     private readonly ch: ClickhouseService,
     private readonly dayReportNum: DayReportNumService
   ) {}
@@ -18,7 +18,7 @@ export class WxPvuvipService {
       type: 1,
       createTime: {$gte: new Date(beginTime), $lt: new Date(endTime)},
     };
-    return await this.mongo.WxPvuvip().find(querydata).read('secondaryPreferred').exec();
+    return await this.models.WxPvuvip().find(querydata).read('secondaryPreferred').exec();
   }
 
   async getPvUvIpSurveyOne(appId: string, beginTime: string | Date, endTime: string | Date) {
@@ -35,7 +35,7 @@ export class WxPvuvipService {
       const numResult = await this.dayReportNum.getDayFromMongo(appId, beginTime, endTime);
       num = numResult.num;
     }
-    const data = await this.mongo.WxPvuvip().findOne(query).read('secondaryPreferred').exec();
+    const data = await this.models.WxPvuvip().findOne(query).read('secondaryPreferred').exec();
     if (data) {
       const obj: any = data;
       obj.num = num;
@@ -48,7 +48,7 @@ export class WxPvuvipService {
 
   async getHistoryPvUvIplist(appId: string) {
     const query = {appId, type: 2};
-    const data = await this.mongo
+    const data = await this.models
       .WxPvuvip()
       .find(query)
       .read('secondaryPreferred')
@@ -102,7 +102,7 @@ export class WxPvuvipService {
   }
 
   async pv(appId: string, querydata: any) {
-    return this.mongo.WxPage(appId).count(querydata).read('secondaryPreferred').exec();
+    return this.models.WxPage(appId).count(querydata).read('secondaryPreferred').exec();
   }
 
   async ajax(appId: string, {beginTime, endTime}: {beginTime: any; endTime: any}) {
@@ -117,7 +117,7 @@ export class WxPvuvipService {
   }
 
   async uv(appId: string, querydata: any) {
-    return this.mongo
+    return this.models
       .WxPage(appId)
       .aggregate([
         {$match: querydata},
@@ -133,7 +133,7 @@ export class WxPvuvipService {
   }
 
   async ip(appId: string, querydata: any) {
-    return this.mongo
+    return this.models
       .WxPage(appId)
       .aggregate([
         {$match: querydata},
@@ -146,7 +146,7 @@ export class WxPvuvipService {
   }
 
   async user(appId: string, querydata: any) {
-    return this.mongo
+    return this.models
       .WxPage(appId)
       .aggregate([
         {$match: querydata},
@@ -159,7 +159,7 @@ export class WxPvuvipService {
   }
 
   async bounce(appId: string, $match: any) {
-    const result = await this.mongo
+    const result = await this.models
       .WxPage(appId)
       .aggregate([
         {$match},
@@ -191,7 +191,7 @@ export class WxPvuvipService {
   }
 
   async savePvUvIpData(appId: string, endTime: Date, type: number, pvuvipdata: any) {
-    const pvuvipModel = this.mongo.WxPvuvip();
+    const pvuvipModel = this.models.WxPvuvip();
     const pvuvip = new pvuvipModel();
     pvuvip.appId = appId;
     pvuvip.pv = pvuvipdata.pv || 0;

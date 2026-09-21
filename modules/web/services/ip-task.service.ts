@@ -1,6 +1,6 @@
 import {Injectable} from '@nestjs/common';
 import {ConfigService} from '@nestjs/config';
-import {MongoModelsService} from '../../../models/mongo/mongo.service';
+import {MonitorModelsService} from '../../../models/mongo/monitor-models.service';
 import {RedisService} from '../../../models/redis/redis.service';
 import {SystemService} from '../../../modules/system/system.service';
 import {func} from '../../../shared/utils';
@@ -12,7 +12,7 @@ export class WebIpTaskService {
   private cfg: any;
   constructor(
     private readonly config: ConfigService,
-    private readonly mongo: MongoModelsService,
+    private readonly models: MonitorModelsService,
     private readonly redis: RedisService,
     private readonly system: SystemService
   ) {
@@ -36,7 +36,7 @@ export class WebIpTaskService {
       query.createTime = {
         $gt: beginTime ? new Date(beginTime) : new Date(Date.now() - this.cfg.ip_task_space_time),
       };
-      const datas = await this.mongo
+      const datas = await this.models
         .WebEnvironment(appId)
         .find(query)
         .read('secondaryPreferred')
@@ -120,7 +120,7 @@ export class WebIpTaskService {
   }
 
   private async updateWebEnvironment(data: any, id: string, appId: string) {
-    return await this.mongo
+    return await this.models
       .WebEnvironment(appId)
       .updateOne({_id: id}, {$set: {province: data.province, city: data.city}}, {upsert: true})
       .exec();

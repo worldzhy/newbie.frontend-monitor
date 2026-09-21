@@ -1,5 +1,5 @@
 import {Prop, Schema, SchemaFactory} from '@nestjs/mongoose';
-import {Document} from 'mongoose';
+import {Document, Schema as MongooseSchema} from 'mongoose';
 
 @Schema({shardKey: {_id: 'hashed'}})
 export class WxCustom {
@@ -10,7 +10,7 @@ export class WxCustom {
   @Prop() path: string; // Path
   @Prop() customName: string; // Custom name for grouping
   @Prop() customContent: string; // Custom info (stringified object)
-  @Prop({type: Object}) customFilter: any; // Custom filter defined by biz
+  @Prop({type: MongooseSchema.Types.Mixed}) customFilter: any; // Custom filter defined by biz
   @Prop() phone: string; // User phone
   @Prop() uid: string; // User ID
 }

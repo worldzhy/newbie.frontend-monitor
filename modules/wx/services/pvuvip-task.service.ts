@@ -1,7 +1,7 @@
 import {Injectable} from '@nestjs/common';
 import {ConfigService} from '@nestjs/config';
 import {SystemService} from '../../../modules/system/system.service';
-import {MongoModelsService} from '../../../models/mongo/mongo.service';
+import {MonitorModelsService} from '../../../models/mongo/monitor-models.service';
 import {ClickhouseService} from '../../../models/clickhouse/clickhouse.service';
 import {func} from '../../../shared/utils';
 
@@ -18,7 +18,7 @@ export class WxPvuvipTaskService {
   constructor(
     private readonly config: ConfigService,
     private readonly system: SystemService,
-    private readonly mongo: MongoModelsService,
+    private readonly models: MonitorModelsService,
     private readonly ch: ClickhouseService
   ) {
     this.cfg = this.config.get('microservices.frontend-monitor');
@@ -33,12 +33,12 @@ export class WxPvuvipTaskService {
     const jobs = systems.map(async (sys: any) => {
       const appId = sys.appId;
       if (!appId || sys.isUse !== 0) return;
-      const pv = await this.mongo
+      const pv = await this.models
         .WxPage(appId)
         .count({createTime: {$gte: beginTime, $lte: endTime}})
         .read('secondaryPreferred')
         .exec();
-      const uvRows = await this.mongo
+      const uvRows = await this.models
         .WxPage(appId)
         .aggregate([
           {$match: {createTime: {$gte: beginTime, $lte: endTime}}},
@@ -46,7 +46,7 @@ export class WxPvuvipTaskService {
         ])
         .read('secondaryPreferred')
         .exec();
-      const ipRows = await this.mongo
+      const ipRows = await this.models
         .WxPage(appId)
         .aggregate([
           {$match: {createTime: {$gte: beginTime, $lte: endTime}}},
@@ -62,7 +62,7 @@ export class WxPvuvipTaskService {
         where: `createTime>=toDateTime('${beginStr}') and createTime<=toDateTime('${endStr}')`,
       });
       const ajax = ajaxRows?.[0]?.count || 0;
-      const pvuvipModel = this.mongo.WxPvuvip();
+      const pvuvipModel = this.models.WxPvuvip();
       const row = new pvuvipModel();
       row.appId = appId;
       row.pv = pv || 0;

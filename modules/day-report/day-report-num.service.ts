@@ -1,5 +1,5 @@
 import {Injectable} from '@nestjs/common';
-import {MongoModelsService} from '../../models/mongo/mongo.service';
+import {MonitorModelsService} from '../../models/mongo/monitor-models.service';
 import {RedisService} from '../../models/redis/redis.service';
 import {ConfigService} from '@nestjs/config';
 import moment from 'moment';
@@ -10,7 +10,7 @@ import {RedisKeyPrefix} from '../../models/enum';
 export class DayReportNumService {
   private cfg: any;
   constructor(
-    private readonly mongo: MongoModelsService,
+    private readonly models: MonitorModelsService,
     private readonly redis: RedisService,
     private readonly configService: ConfigService
   ) {
@@ -20,14 +20,14 @@ export class DayReportNumService {
   async numCountTask() {
     const date = new Date(new Date().getTime() - 86400000);
     const yesterday = new Date(func.format(date, 'yyyy/MM/dd')).getTime();
-    const apps = await this.mongo.System().find().read('secondaryPreferred').exec();
+    const apps = await this.models.System().find().read('secondaryPreferred').exec();
 
     for (const app of apps) {
       const key = `${RedisKeyPrefix.DAY_REPORT_NUM}${app.appId}_${yesterday}`;
       const num = await this.redis.get(key);
       if (!num) continue;
 
-      const DayModel = this.mongo.DayReportNum();
+      const DayModel = this.models.DayReportNum();
       const repore = new DayModel();
       repore.appId = app.appId;
       repore.type = app.type;
@@ -53,7 +53,7 @@ export class DayReportNumService {
       },
     };
     return (
-      (await this.mongo.DayReportNum().findOne(query, {num: 1, dayTime: 1}).read('secondaryPreferred').exec()) ||
+      (await this.models.DayReportNum().findOne(query, {num: 1, dayTime: 1}).read('secondaryPreferred').exec()) ||
       ({} as any)
     );
   }

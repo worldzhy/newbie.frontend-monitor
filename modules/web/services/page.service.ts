@@ -1,5 +1,5 @@
 import {Injectable} from '@nestjs/common';
-import {MongoModelsService} from '../../../models/mongo/mongo.service';
+import {MonitorModelsService} from '../../../models/mongo/monitor-models.service';
 import {ConfigService} from '@nestjs/config';
 import {func} from '../../../shared/utils';
 
@@ -7,7 +7,7 @@ import {func} from '../../../shared/utils';
 export class PageService {
   private cfg: any;
   constructor(
-    private readonly mongo: MongoModelsService,
+    private readonly models: MonitorModelsService,
     private readonly config: ConfigService
   ) {
     this.cfg = this.config.get('microservices.frontend-monitor');
@@ -29,7 +29,7 @@ export class PageService {
   }
 
   private async getPages(appId: string, match: any, pageNo: number, pageSize: number) {
-    const model = this.mongo.WebPage(appId);
+    const model = this.models.WebPage(appId);
     const distinct = (await model.distinct('url', match).read('secondaryPreferred').exec()) || [];
     const copdistinct = distinct.slice();
     const slice = distinct.slice((pageNo - 1) * pageSize, (pageNo - 1) * pageSize + pageSize);
@@ -50,7 +50,7 @@ export class PageService {
       };
     }
     const jobs = slice.map((url: string) =>
-      this.mongo
+      this.models
         .WebPage(appId)
         .aggregate([
           {$match: {...match, url}},
@@ -67,8 +67,8 @@ export class PageService {
   }
 
   private async oneThread(appId: string, match: any, pageNo: number, pageSize: number, group_id: any) {
-    const count = await this.mongo.WebPage(appId).distinct('url', match).read('secondaryPreferred').exec();
-    const dataList = await this.mongo
+    const count = await this.models.WebPage(appId).distinct('url', match).read('secondaryPreferred').exec();
+    const dataList = await this.models
       .WebPage(appId)
       .aggregate([
         {$match: match},
@@ -100,7 +100,7 @@ export class PageService {
     const match: any = {isFirstIn: true};
     if (type) match.speedType = Number(type);
     const _querys: any = this.getSpaceTime(beginTime, endTime, 60000);
-    const result = await this.mongo
+    const result = await this.models
       .WebPage(appId)
       .aggregate([
         {$match: match},
@@ -180,8 +180,8 @@ export class PageService {
         $gte: new Date(beginTime),
         $lte: new Date(endTime),
       };
-    const count = await this.mongo.WebPage(appId).count(match).read('secondaryPreferred').exec();
-    const dataList = await this.mongo
+    const count = await this.models.WebPage(appId).count(match).read('secondaryPreferred').exec();
+    const dataList = await this.models
       .WebPage(appId)
       .aggregate([
         {$match: match},
@@ -195,7 +195,7 @@ export class PageService {
   }
 
   async getPageDetails(appId: string, id: string) {
-    return await this.mongo.WebPage(appId).findOne({_id: id}).read('secondaryPreferred').exec();
+    return await this.models.WebPage(appId).findOne({_id: id}).read('secondaryPreferred').exec();
   }
 
   private getSpaceTime(beginTime?: string, endTime?: string, spaceTime = 60000) {

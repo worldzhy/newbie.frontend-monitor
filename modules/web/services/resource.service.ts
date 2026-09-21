@@ -1,12 +1,12 @@
 import {Injectable} from '@nestjs/common';
-import {MongoModelsService} from '../../../models/mongo/mongo.service';
+import {MonitorModelsService} from '../../../models/mongo/monitor-models.service';
 import {ConfigService} from '@nestjs/config';
 
 @Injectable()
 export class ResourceService {
   private cfg: any;
   constructor(
-    private readonly mongo: MongoModelsService,
+    private readonly models: MonitorModelsService,
     private readonly config: ConfigService
   ) {
     this.cfg = this.config.get('microservices.frontend-monitor');
@@ -23,8 +23,8 @@ export class ResourceService {
   ) {
     const match: any = {url, speedType: Number(speedType)};
     if (beginTime && endTime) match.createTime = {$gte: new Date(beginTime), $lte: new Date(endTime)};
-    const count = await this.mongo.WebResource(appId).count(match).read('secondaryPreferred').exec();
-    const dataList = await this.mongo
+    const count = await this.models.WebResource(appId).count(match).read('secondaryPreferred').exec();
+    const dataList = await this.models
       .WebResource(appId)
       .aggregate([
         {$match: match},
@@ -48,8 +48,8 @@ export class ResourceService {
       match.createTime = createTime;
     }
     const group_id = {url: '$name', method: '$method'};
-    const count = await this.mongo.WebResource(appId).distinct('name', match).read('secondaryPreferred').exec();
-    const dataList = await this.mongo
+    const count = await this.models.WebResource(appId).distinct('name', match).read('secondaryPreferred').exec();
+    const dataList = await this.models
       .WebResource(appId)
       .aggregate([
         {$match: match},
@@ -66,7 +66,7 @@ export class ResourceService {
   async getOneResourceAvg(appId: string, url: string, beginTime?: string, endTime?: string) {
     const match: any = {name: url};
     if (beginTime && endTime) match.createTime = {$gte: new Date(beginTime), $lte: new Date(endTime)};
-    const rows = await this.mongo
+    const rows = await this.models
       .WebResource(appId)
       .aggregate([
         {$match: match},
@@ -87,8 +87,8 @@ export class ResourceService {
   ) {
     const match: any = {name: url};
     if (beginTime && endTime) match.createTime = {$gte: new Date(beginTime), $lte: new Date(endTime)};
-    const count = await this.mongo.WebResource(appId).count(match).read('secondaryPreferred').exec();
-    const dataList = await this.mongo
+    const count = await this.models.WebResource(appId).count(match).read('secondaryPreferred').exec();
+    const dataList = await this.models
       .WebResource(appId)
       .aggregate([
         {$match: match},
@@ -102,6 +102,6 @@ export class ResourceService {
   }
 
   async getOneResourceDetail(appId: string, id: string) {
-    return await this.mongo.WebResource(appId).findOne({_id: id}).read('secondaryPreferred').exec();
+    return await this.models.WebResource(appId).findOne({_id: id}).read('secondaryPreferred').exec();
   }
 }

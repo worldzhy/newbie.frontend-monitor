@@ -1,7 +1,7 @@
 import {Injectable} from '@nestjs/common';
 import {ConfigService} from '@nestjs/config';
 import {RedisService} from '../../../models/redis/redis.service';
-import {MongoModelsService} from '../../../models/mongo/mongo.service';
+import {MonitorModelsService} from '../../../models/mongo/monitor-models.service';
 import {ClickhouseService} from '../../../models/clickhouse/clickhouse.service';
 import {SystemService} from '../../../modules/system/system.service';
 import {func} from '../../../shared/utils';
@@ -13,7 +13,7 @@ export class WxReportTaskService {
   constructor(
     private readonly config: ConfigService,
     private readonly redis: RedisService,
-    private readonly mongo: MongoModelsService,
+    private readonly models: MonitorModelsService,
     private readonly ch: ClickhouseService,
     private readonly system: SystemService
   ) {
@@ -105,7 +105,7 @@ export class WxReportTaskService {
   }
 
   private async savePages(item: any) {
-    const Model = this.mongo.WxPage(item.appId);
+    const Model = this.models.WxPage(item.appId);
     const pages = new Model();
     pages.appId = item.appId;
     pages.createTime = item.createTime;
@@ -220,7 +220,7 @@ export class WxReportTaskService {
 
   private async saveCustoms(data: any) {
     if (!data.customs || !data.customs.length) return;
-    const Model = this.mongo.WxCustom(data.appId);
+    const Model = this.models.WxCustom(data.appId);
     for (const item of data.customs) {
       const customs = new Model();
       customs.appId = data.appId;

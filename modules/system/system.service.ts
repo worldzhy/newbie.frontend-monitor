@@ -1,12 +1,12 @@
 import {Injectable} from '@nestjs/common';
-import {MongoModelsService} from '../../models/mongo/mongo.service';
+import {MonitorModelsService} from '../../models/mongo/monitor-models.service';
 import {NodeCacheService} from '../../shared/node-cache.service';
 import {func} from '../../shared/utils';
 
 @Injectable()
 export class SystemService {
   constructor(
-    private readonly mongo: MongoModelsService,
+    private readonly models: MonitorModelsService,
     private readonly nodeCache: NodeCacheService
   ) {}
 
@@ -18,11 +18,11 @@ export class SystemService {
     if (!body.systemName) return func.errResult({desc: '新增系统信息操作：系统名称不能为空'});
     
     if (type === 'web') {
-      const search = await this.mongo.System().findOne({systemDomain: body.systemDomain}).exec();
+      const search = await this.models.System().findOne({systemDomain: body.systemDomain}).exec();
       if (search && search.systemDomain) return func.errResult({desc: '新增系统信息操作：系统已存在'});
     }
     if (type === 'wx') {
-      const r = await this.mongo.System().findOne({appId: body.appId}).exec();
+      const r = await this.models.System().findOne({appId: body.appId}).exec();
       if (r && r.appId)
         return func.errResult({
           desc: '新增系统信息操作：系统已存在,appid重复',
@@ -30,7 +30,7 @@ export class SystemService {
     }
 
     const appId = body.appId ? body.appId : func.randomString();
-    const SystemModel = this.mongo.System();
+    const SystemModel = this.models.System();
     const system = new SystemModel();
     system.projectId = body.projectId;
     system.systemDomain = body.systemDomain;
@@ -81,7 +81,7 @@ export class SystemService {
         isWarning: body.isWarning || 0,
       },
     };
-    const result = await this.mongo.System().updateOne({appId: appId}, update, {multi: true}).exec();
+    const result = await this.models.System().updateOne({appId: appId}, update, {multi: true}).exec();
     await this.updateSystemNodeCache(appId);
     return func.result({data: result});
   }
@@ -93,7 +93,7 @@ export class SystemService {
 
   async getSystemForDb(appId: string) {
     if (!appId) throw new Error('查询某个系统信：appId不能为空');
-    return (await this.mongo.System().findOne({appId: appId}).exec()) || ({} as any);
+    return (await this.models.System().findOne({appId: appId}).exec()) || ({} as any);
   }
 
   async getSysForUserId(query: any) {
@@ -103,7 +103,7 @@ export class SystemService {
     if (systemName) param.systemName = new RegExp(systemName);
     if (type) param.type = type;
     if (projectId) param.projectId = projectId;
-    return (await this.mongo.System().find(param).exec()) || [];
+    return (await this.models.System().find(param).exec()) || [];
   }
 
   async getSystemForAppId(appId: string) {
@@ -112,39 +112,39 @@ export class SystemService {
   }
 
   async getSysForAlarm() {
-    return (await this.mongo.System().find({isWarning: 1}).read('secondaryPreferred').exec()) || [];
+    return (await this.models.System().find({isWarning: 1}).read('secondaryPreferred').exec()) || [];
   }
 
   async getSysForDaily() {
-    return (await this.mongo.System().find({isDailyUse: 0}).read('secondaryPreferred').exec()) || [];
+    return (await this.models.System().find({isDailyUse: 0}).read('secondaryPreferred').exec()) || [];
   }
 
   async getSystemList() {
-    return (await this.mongo.System().find({}).exec()) || [];
+    return (await this.models.System().find({}).exec()) || [];
   }
 
   async getWebSystemList() {
-    return (await this.mongo.System().find({type: 'web'}).exec()) || [];
+    return (await this.models.System().find({type: 'web'}).exec()) || [];
   }
   async getWxSystemList() {
-    return (await this.mongo.System().find({type: 'wx'}).exec()) || [];
+    return (await this.models.System().find({type: 'wx'}).exec()) || [];
   }
 
   async deleteWebSystemUser(appId: string, userToken: string) {
-    return this.mongo
+    return this.models
       .System()
       .updateOne({appId: appId}, {$pull: {userId: userToken}}, {multi: true})
       .exec();
   }
   async addWebSystemUser(appId: string, userToken: string) {
-    return this.mongo
+    return this.models
       .System()
       .updateOne({appId: appId}, {$push: {userId: userToken}}, {multi: true})
       .exec();
   }
 
   async deleteSystem(appId: string, type: string): Promise<any> {
-    return this.mongo.System().deleteOne({appId: appId, type}).exec();
+    return this.models.System().deleteOne({appId: appId, type}).exec();
   }
 
   async handleDaliyEmail(appId: string, email: string, type: number, _handleEmali = true, item = 1) {
@@ -152,7 +152,7 @@ export class SystemService {
     if (!system) throw new Error('appId无效');
     const listKey: 'daliyList' | 'highestList' = item === 2 ? 'highestList' : 'daliyList';
     const update = type === 1 ? {$addToSet: {[listKey]: email}} : {$pull: {[listKey]: email}};
-    return this.mongo.System().updateOne({appId: appId}, update, {multi: true}).exec();
+    return this.models.System().updateOne({appId: appId}, update, {multi: true}).exec();
   }
 
   async updateEmailSystemIds(emailAddr: string, appId: string, handletype = 1, handleitem = 1) {
@@ -173,6 +173,6 @@ export class SystemService {
             },
           }
         : {$pull: {systemIds: {systemId: appId, type}}};
-    return this.mongo.Email().updateOne({email: emailAddr}, handleData, {multi: true}).exec();
+    return this.models.Email().updateOne({email: emailAddr}, handleData, {multi: true}).exec();
   }
 }

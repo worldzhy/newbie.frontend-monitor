@@ -1,9 +1,9 @@
 import {Injectable} from '@nestjs/common';
-import {MongoModelsService} from '../../../models/mongo/mongo.service';
+import {MonitorModelsService} from '../../../models/mongo/monitor-models.service';
 
 @Injectable()
 export class EnvironmentService {
-  constructor(private readonly mongo: MongoModelsService) {}
+  constructor(private readonly models: MonitorModelsService) {}
 
   async getDataGroupBy(type: number, url: string, appId: string, beginTime?: string, endTime?: string) {
     const match: any = {url};
@@ -14,7 +14,7 @@ export class EnvironmentService {
       browser: `${type === 2 ? '$browser' : ''}`,
       system: `${type === 3 ? '$system' : ''}`,
     };
-    const datas = await this.mongo
+    const datas = await this.models
       .WebEnvironment(appId)
       .aggregate([{$match: match}, {$group: {_id: group_id, count: {$sum: 1}}}, {$sort: {count: -1}}, {$limit: 10}])
       .read('secondaryPreferred')
@@ -23,6 +23,6 @@ export class EnvironmentService {
   }
 
   async getEnvironmentForPage(appId: string, markPage: string) {
-    return await this.mongo.WebEnvironment(appId).findOne({markPage}).read('secondaryPreferred').exec();
+    return await this.models.WebEnvironment(appId).findOne({markPage}).read('secondaryPreferred').exec();
   }
 }

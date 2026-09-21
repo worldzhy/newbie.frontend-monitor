@@ -1,6 +1,6 @@
 import {Injectable} from '@nestjs/common';
 import {ConfigService} from '@nestjs/config';
-import {MongoModelsService} from '../../../models/mongo/mongo.service';
+import {MonitorModelsService} from '../../../models/mongo/monitor-models.service';
 import {RedisService} from '../../../models/redis/redis.service';
 import {SystemService} from '../../../modules/system/system.service';
 import {func} from '../../../shared/utils';
@@ -12,7 +12,7 @@ export class WxIpTaskService {
   private cfg: any;
   constructor(
     private readonly config: ConfigService,
-    private readonly mongo: MongoModelsService,
+    private readonly models: MonitorModelsService,
     private readonly redis: RedisService,
     private readonly system: SystemService
   ) {
@@ -36,7 +36,7 @@ export class WxIpTaskService {
       query.createTime = {
         $gt: beginTime ? new Date(beginTime) : new Date(Date.now() - this.cfg.ip_task_space_time),
       };
-      const datas = await this.mongo
+      const datas = await this.models
         .WxPage(appId)
         .find(query)
         .read('secondaryPreferred')
@@ -122,7 +122,7 @@ export class WxIpTaskService {
   }
 
   private async updateWxPages(data: any, id: string, appId: string) {
-    return await this.mongo
+    return await this.models
       .WxPage(appId)
       .updateOne({_id: id}, {$set: {province: data.province, city: data.city}}, {upsert: true})
       .exec();

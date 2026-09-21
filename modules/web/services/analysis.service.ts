@@ -1,12 +1,12 @@
 import {Injectable} from '@nestjs/common';
-import {MongoModelsService} from '../../../models/mongo/mongo.service';
+import {MonitorModelsService} from '../../../models/mongo/monitor-models.service';
 import {ConfigService} from '@nestjs/config';
 
 @Injectable()
 export class AnalysisService {
   private cfg: any;
   constructor(
-    private readonly mongo: MongoModelsService,
+    private readonly models: MonitorModelsService,
     private readonly config: ConfigService
   ) {
     this.cfg = this.config.get('microservices.frontend-monitor');
@@ -25,7 +25,7 @@ export class AnalysisService {
       createTime.$lte = new Date(endTime);
       query.$match.createTime = createTime;
     }
-    const result = await this.mongo
+    const result = await this.models
       .WebEnvironment(appId)
       .aggregate([
         query,
@@ -38,7 +38,7 @@ export class AnalysisService {
   }
 
   async getAnalysisOneList(appId: string, markUser: string) {
-    return await this.mongo
+    return await this.models
       .WebEnvironment(appId)
       .find({markUser})
       .read('secondaryPreferred')
@@ -75,7 +75,7 @@ export class AnalysisService {
 
   private async getRealTimeTopPagesForDb(appId: string, beginTime?: string, endTime?: string) {
     const $match = this.getMatch(beginTime, endTime);
-    return await this.mongo
+    return await this.models
       .WebPage(appId)
       .aggregate([
         {$match: {...$match}},
@@ -89,7 +89,7 @@ export class AnalysisService {
 
   private async getRealTimeTopJumpOutForDb(appId: string, beginTime?: string, endTime?: string) {
     const $match = this.getMatch(beginTime, endTime);
-    return await this.mongo
+    return await this.models
       .WebEnvironment(appId)
       .aggregate([
         {$match: $match},
@@ -105,7 +105,7 @@ export class AnalysisService {
 
   private async getRealTimeTopBrowserForDb(appId: string, beginTime?: string, endTime?: string) {
     const $match = this.getMatch(beginTime, endTime);
-    return await this.mongo
+    return await this.models
       .WebEnvironment(appId)
       .aggregate([
         {$match: {...$match}},
@@ -119,7 +119,7 @@ export class AnalysisService {
 
   private async getRealTimeTopProvinceForDb(appId: string, beginTime?: string, endTime?: string) {
     const $match = this.getMatch(beginTime, endTime);
-    return await this.mongo
+    return await this.models
       .WebEnvironment(appId)
       .aggregate([
         {$match: {...$match}},

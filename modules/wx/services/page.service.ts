@@ -1,5 +1,5 @@
 import {Injectable} from '@nestjs/common';
-import {MongoModelsService} from '../../../models/mongo/mongo.service';
+import {MonitorModelsService} from '../../../models/mongo/monitor-models.service';
 import {ConfigService} from '@nestjs/config';
 import {func} from '../../../shared/utils';
 
@@ -7,7 +7,7 @@ import {func} from '../../../shared/utils';
 export class WxPageService {
   private cfg: any;
   constructor(
-    private readonly mongo: MongoModelsService,
+    private readonly models: MonitorModelsService,
     private readonly config: ConfigService
   ) {
     this.cfg = this.config.get('microservices.frontend-monitor');
@@ -28,12 +28,12 @@ export class WxPageService {
   private async moreThread(appId: string, queryjson: any, pageNo: number, pageSize: number, group_id: any) {
     const result: any[] = [];
     let distinct =
-      (await this.mongo.WxPage(appId).distinct('path', queryjson.$match).read('secondaryPreferred').exec()) || [];
+      (await this.models.WxPage(appId).distinct('path', queryjson.$match).read('secondaryPreferred').exec()) || [];
     const copdistinct = distinct.slice();
     const betinIndex = (pageNo - 1) * pageSize;
     if (distinct && distinct.length) distinct = distinct.slice(betinIndex, betinIndex + pageSize);
     const resolvelist = distinct.filter(Boolean).map((item: string) =>
-      this.mongo
+      this.models
         .WxPage(appId)
         .aggregate([{$match: {path: item, ...queryjson.$match}}, {$group: {_id: group_id, count: {$sum: 1}}}])
         .read('secondaryPreferred')
@@ -45,8 +45,8 @@ export class WxPageService {
   }
 
   private async oneThread(appId: string, queryjson: any, pageNo: number, pageSize: number, group_id: any) {
-    const count = await this.mongo.WxPage(appId).distinct('path', queryjson.$match).read('secondaryPreferred').exec();
-    const datas = await this.mongo
+    const count = await this.models.WxPage(appId).distinct('path', queryjson.$match).read('secondaryPreferred').exec();
+    const datas = await this.models
       .WxPage(appId)
       .aggregate([
         queryjson,
@@ -64,8 +64,8 @@ export class WxPageService {
     const {appId, pageNo = 1, pageSize = this.cfg.pageSize, url} = query;
     const match: any = {path: url};
     func.setMatchTime(query, match);
-    const count = await this.mongo.WxPage(appId).count(match).read('secondaryPreferred').exec();
-    const datas = await this.mongo
+    const count = await this.models.WxPage(appId).count(match).read('secondaryPreferred').exec();
+    const datas = await this.models
       .WxPage(appId)
       .aggregate([
         {$match: match},
@@ -79,7 +79,7 @@ export class WxPageService {
   }
 
   async getPageDetails(appId: string, query: any) {
-    return await this.mongo.WxPage(appId).findOne(query).read('secondaryPreferred').exec();
+    return await this.models.WxPage(appId).findOne(query).read('secondaryPreferred').exec();
   }
 
   async getDataGroupBy(type: number, url: string, appId: string, beginTime?: string, endTime?: string) {
@@ -93,7 +93,7 @@ export class WxPageService {
     if (Number(type) === 1) group_id.city = '$city';
     else if (Number(type) === 2) group_id.brand = '$brand';
     else if (Number(type) === 3) group_id.system = '$system';
-    const datas = await this.mongo
+    const datas = await this.models
       .WxPage(appId)
       .aggregate([{$match: match}, {$group: {_id: group_id, count: {$sum: 1}}}, {$sort: {count: -1}}, {$limit: 10}])
       .read('secondaryPreferred')

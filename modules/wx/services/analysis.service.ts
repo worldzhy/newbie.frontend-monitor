@@ -1,12 +1,12 @@
 import {Injectable} from '@nestjs/common';
-import {MongoModelsService} from '../../../models/mongo/mongo.service';
+import {MonitorModelsService} from '../../../models/mongo/monitor-models.service';
 import {ConfigService} from '@nestjs/config';
 
 @Injectable()
 export class WxAnalysisService {
   private cfg: any;
   constructor(
-    private readonly mongo: MongoModelsService,
+    private readonly models: MonitorModelsService,
     private readonly config: ConfigService
   ) {
     this.cfg = this.config.get('microservices.frontend-monitor');
@@ -29,7 +29,7 @@ export class WxAnalysisService {
   }
 
   private async fixDistinct(appId: string, query: any) {
-    const result = await this.mongo
+    const result = await this.models
       .WxPage(appId)
       .aggregate([
         query,
@@ -47,7 +47,7 @@ export class WxAnalysisService {
   }
 
   async getAnalysisOneList(appId: string, markUser: string) {
-    return await this.mongo.WxPage(appId).find({markUser}).read('secondaryPreferred').sort({createTime: 1}).exec();
+    return await this.models.WxPage(appId).find({markUser}).read('secondaryPreferred').sort({createTime: 1}).exec();
   }
 
   async getTopDatas(appId: string, beginTime?: string, endTime?: string) {
@@ -60,7 +60,7 @@ export class WxAnalysisService {
 
   private async getRealTimeTopPagesForDb(appId: string, beginTime?: string, endTime?: string) {
     const $match = this.getMatch(beginTime, endTime);
-    const result = await this.mongo
+    const result = await this.models
       .WxPage(appId)
       .aggregate([
         {$match},
@@ -75,7 +75,7 @@ export class WxAnalysisService {
 
   private async getRealTimeTopJumpOutForDb(appId: string, beginTime?: string, endTime?: string) {
     const $match = this.getMatch(beginTime, endTime);
-    const result = await this.mongo
+    const result = await this.models
       .WxPage(appId)
       .aggregate([
         {$match: $match},
@@ -103,7 +103,7 @@ export class WxAnalysisService {
 
   private async getRealTimeTopBrandForDb(appId: string, beginTime?: string, endTime?: string) {
     const $match = this.getMatch(beginTime, endTime);
-    const result = await this.mongo
+    const result = await this.models
       .WxPage(appId)
       .aggregate([
         {$match},
@@ -118,7 +118,7 @@ export class WxAnalysisService {
 
   private async getRealTimeTopProvinceForDb(appId: string, beginTime?: string, endTime?: string) {
     const $match = this.getMatch(beginTime, endTime);
-    const result = await this.mongo
+    const result = await this.models
       .WxPage(appId)
       .aggregate([{$match}, {$group: {_id: {province: '$province'}, count: {$sum: 1}}}, {$sort: {count: -1}}])
       .read('secondaryPreferred')

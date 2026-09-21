@@ -1,12 +1,12 @@
 import {Injectable} from '@nestjs/common';
 import moment from 'moment';
-import {MongoModelsService} from '../../models/mongo/mongo.service';
+import {MonitorModelsService} from '../../models/mongo/monitor-models.service';
 import {ClickhouseService} from '../../models/clickhouse/clickhouse.service';
 
 @Injectable()
 export class RemoveService {
   constructor(
-    private readonly mongo: MongoModelsService,
+    private readonly models: MonitorModelsService,
     private readonly clickhouse: ClickhouseService
   ) {}
 
@@ -40,7 +40,7 @@ export class RemoveService {
               break;
             }
             case 'page': {
-              arr.push(Promise.resolve(this.mongo.WxPage(appId).deleteMany(query).exec()));
+              arr.push(Promise.resolve(this.models.WxPage(appId).deleteMany(query).exec()));
               break;
             }
             case 'err': {
@@ -87,11 +87,11 @@ export class RemoveService {
               break;
             }
             case 'page': {
-              arr.push(Promise.resolve(this.mongo.WebPage(appId).deleteMany(query).exec()));
+              arr.push(Promise.resolve(this.models.WebPage(appId).deleteMany(query).exec()));
               break;
             }
             case 'env': {
-              arr.push(Promise.resolve(this.mongo.WebEnvironment(appId).deleteMany(query).exec()));
+              arr.push(Promise.resolve(this.models.WebEnvironment(appId).deleteMany(query).exec()));
               break;
             }
             case 'err': {
@@ -106,7 +106,7 @@ export class RemoveService {
               break;
             }
             case 'resource': {
-              arr.push(Promise.resolve(this.mongo.WebResource(appId).deleteMany(query).exec()));
+              arr.push(Promise.resolve(this.models.WebResource(appId).deleteMany(query).exec()));
             }
           }
         }

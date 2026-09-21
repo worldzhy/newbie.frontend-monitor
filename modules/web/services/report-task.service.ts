@@ -3,7 +3,7 @@ import {ConfigService} from '@nestjs/config';
 import {RedisService} from '../../../models/redis/redis.service';
 import {SystemService} from '../../../modules/system/system.service';
 import {ClickhouseService} from '../../../models/clickhouse/clickhouse.service';
-import {MongoModelsService} from '../../../models/mongo/mongo.service';
+import {MonitorModelsService} from '../../../models/mongo/monitor-models.service';
 import {func} from '../../../shared/utils';
 import {UAParser} from 'ua-parser-js';
 import {RedisKeys, ReportType} from '../../../models/enum';
@@ -15,7 +15,7 @@ export class WebReportTaskService {
     private readonly config: ConfigService,
     private readonly redis: RedisService,
     private readonly system: SystemService,
-    private readonly mongo: MongoModelsService,
+    private readonly models: MonitorModelsService,
     private readonly ch: ClickhouseService
   ) {
     this.cfg = this.config.get('microservices.frontend-monitor');
@@ -62,7 +62,7 @@ export class WebReportTaskService {
     }
     slowPageTime = slowPageTime * 1000;
     const speedType = performance.lodt >= slowPageTime ? 2 : 1;
-    const PageModel = this.mongo.WebPage(item.appId);
+    const PageModel = this.models.WebPage(item.appId);
     const pages = new PageModel();
     pages.appId = item.appId;
     pages.createTime = item.createTime;
@@ -86,7 +86,7 @@ export class WebReportTaskService {
 
   private async saveCustoms(data: any) {
     if (!data.customs || !data.customs.length) return;
-    const CustomModel = this.mongo.WebCustom(data.appId);
+    const CustomModel = this.models.WebCustom(data.appId);
     for (const item of data.customs) {
       const customs = new CustomModel();
       customs.appId = data.appId;
@@ -125,7 +125,7 @@ export class WebReportTaskService {
     } catch {
       newName = item.name || '';
     }
-    const ResourceModel = this.mongo.WebResource(data.appId);
+    const ResourceModel = this.models.WebResource(data.appId);
     const resours = new ResourceModel();
     resours.appId = data.appId;
     resours.createTime = item.requestTime ? new Date(item.requestTime) : data.createTime;
@@ -156,7 +156,7 @@ export class WebReportTaskService {
     } catch {
       datas = null;
     }
-    const EnvModel = this.mongo.WebEnvironment(data.appId);
+    const EnvModel = this.models.WebEnvironment(data.appId);
     const environment = new EnvModel();
     environment.appId = data.appId;
     environment.createTime = data.createTime;
