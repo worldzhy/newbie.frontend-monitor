@@ -16,7 +16,7 @@ export class SystemService {
     if (!body.systemDomain && type === 'web') return func.errResult({desc: '新增系统信息操作：系统域名不能为空'});
     if (!body.appId && type === 'wx') return func.errResult({desc: '新增系统信息操作：appId不能为空'});
     if (!body.systemName) return func.errResult({desc: '新增系统信息操作：系统名称不能为空'});
-    
+
     if (type === 'web') {
       const search = await this.models.System().findOne({systemDomain: body.systemDomain}).exec();
       if (search && search.systemDomain) return func.errResult({desc: '新增系统信息操作：系统已存在'});

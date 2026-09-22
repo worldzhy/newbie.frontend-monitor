@@ -6,7 +6,12 @@ export class WxCustomService {
   constructor(private readonly models: MonitorModelsService) {}
 
   async getCustomFilterList(appId: string) {
-    const rows = await this.models.WxCustomFilter(appId).find().sort({createTime: -1}).read('secondaryPreferred').exec();
+    const rows = await this.models
+      .WxCustomFilter(appId)
+      .find()
+      .sort({createTime: -1})
+      .read('secondaryPreferred')
+      .exec();
     return {list: rows || []};
   }
 
